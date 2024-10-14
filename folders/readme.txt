@@ -23,7 +23,7 @@ Folders is a WordPress plugin that enables users to organize all of their Pages,
 
 Use Folders plugin to organize WordPress content:
 
-* Keep all of your media files organized in folders including photos, videos, music, main website pages, and blog posts. Place media in multiple folders. 
+* Keep all of your media files organized in folders including photos, videos, music, main website pages, and blog posts. You can also organize media library files in multiple folders. 
 * Web developers: keep your clients’ website pages in proper order. Mark a folder with a star or give it a unique name for clients to understand what is important. 
 * Bloggers: manage your own content with ease with this file manager plugin. Organize photos and content by topics, categories, and/or dates. 
 * Quickly upload pages, media, and content to your WordPress and easily organize them into directories. 
