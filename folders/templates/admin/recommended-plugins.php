@@ -349,7 +349,7 @@ if ($data && ! is_wp_error($data)) {
                     if (! $compatible_php || ! $compatible_wp) {
                         echo '<div class="notice inline notice-error notice-alt"><p>';
                         if (! $compatible_php && ! $compatible_wp) {
-                            esc_html_e('This plugin doesn&#8217;t work with your versions of WordPress and PHP.');
+                            esc_html_e('This plugin doesn&#8217;t work with your versions of WordPress and PHP.', 'folders');
                             if (current_user_can('update_core') && current_user_can('update_php')) {
                                 printf(
                                 // translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page.
@@ -382,7 +382,7 @@ if ($data && ! is_wp_error($data)) {
                                 );
                             }
                         } else if (! $compatible_php) {
-                            esc_html_e('This plugin doesn&#8217;t work with your version of PHP.');
+                            esc_html_e('This plugin doesn&#8217;t work with your version of PHP.', 'folders');
                             if (current_user_can('update_php')) {
                                 printf(
                                 // translators: %s: URL to Update PHP page.
@@ -443,7 +443,7 @@ if ($data && ! is_wp_error($data)) {
                                 $active_installs_millions = floor(($plugin['active_installs'] / 1000000));
                                 $active_installs_text     = sprintf(
                                 // translators: %s: Number of millions.
-                                    _nx('%s+ Million', '%s+ Million', $active_installs_millions, 'Active plugin installations'),
+                                    _nx('%s+ Million', '%s+ Million', $active_installs_millions, 'Active plugin installations', 'folders'),
                                     number_format_i18n($active_installs_millions)
                                 );
                             } else if (0 == $plugin['active_installs']) {

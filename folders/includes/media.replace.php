@@ -906,7 +906,7 @@ class folders_replace_media {
      */
     public function folders_admin_css_and_js($page) {
         if($page == "media_page_folders-replace-media" || $page == "admin_page_folders-replace-media") {
-            wp_enqueue_style('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/css/replace-media.css', [], WCP_FOLDER_VERSION);
+            wp_enqueue_style('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/css/replace-media.min.css', [], WCP_FOLDER_VERSION);
 
             wp_enqueue_script('folders-simpledropit', plugin_dir_url(dirname(__FILE__)) . 'assets/js/simpledropit.min.js', [], WCP_FOLDER_VERSION, true);
             wp_enqueue_script('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/js/replace-media.js', [], WCP_FOLDER_VERSION, true);
@@ -1125,7 +1125,7 @@ class folders_replace_media {
             $form_fields["replace_file_name"] = array(
                 "label" => esc_html__("Replace media", "folders"),
                 "input" => "html",
-                "html" => "<label for='attachment_title_" . esc_attr($post->ID) . "' data-post='" . esc_attr($post->ID) . "' data-nonce='" . wp_create_nonce('change_attachment_title_' . $post->ID) . "'><input id='attachment_title_" . esc_attr($post->ID) . "' type='checkbox' class='folder-replace-checkbox' value='" . esc_attr($post->ID) . "'>" . esc_html__("Update file name with title") . "</label><a href='" . $this->upgradeLink . "' target='_blank' style='background: " . esc_attr($this->buttonColor) . "; border-color: " . esc_attr($this->buttonColor) . "; color:#ffffff' type='button' class='button update-name-with-title' >" . esc_html__("Upgrade to Pro", "folders") . "</a>",
+                "html" => "<label for='attachment_title_" . esc_attr($post->ID) . "' data-post='" . esc_attr($post->ID) . "' data-nonce='" . wp_create_nonce('change_attachment_title_' . $post->ID) . "'><input id='attachment_title_" . esc_attr($post->ID) . "' type='checkbox' class='folder-replace-checkbox' value='" . esc_attr($post->ID) . "'>" . esc_html__("Update file name with title", 'folders') . "</label><a href='" . $this->upgradeLink . "' target='_blank' style='background: " . esc_attr($this->buttonColor) . "; border-color: " . esc_attr($this->buttonColor) . "; color:#ffffff' type='button' class='button update-name-with-title' >" . esc_html__("Upgrade to Pro", "folders") . "</a>",
                 "helps" => ""
             );
         }

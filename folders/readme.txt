@@ -2,8 +2,8 @@
 Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 3.0.0
-Tested up to: 6.6
-Stable tag: 3.0.6
+Tested up to: 6.8
+Stable tag: 3.0.7
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -21,7 +21,7 @@ Folders is a WordPress plugin that enables users to organize all of their Pages,
 
 = 💪 How Folders Plugin Can Help You =
 
-Use Folders plugin to organize WordPress content:
+Use Folders plugin to organize your WordPress content:
 
 * Keep all of your media files organized in folders including photos, videos, music, main website pages, and blog posts. You can also organize media library files in multiple folders. 
 * Web developers: keep your clients’ website pages in proper order. Mark a folder with a star or give it a unique name for clients to understand what is important. 
@@ -32,7 +32,7 @@ Use Folders plugin to organize WordPress content:
 
 <strong>Note:</strong> adding a page/post/image into a folder will not change its URL. The folders plugin creates virtual folders, it doesn't create actual folders in your server or WordPress installation.
 
-= ▶️ Live Demo =
+= ▶️ Folders Plugin Live Demo =
 A live demo for the Folders plugin is available at <a href="https://folders-demo.premio.io/wp-admin/" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 = 🛠️ So How Does the Folders plugin Work? =
@@ -43,7 +43,7 @@ Upload text, images, videos, and audio. Then organize everything you upload into
 
 * <strong>Create unlimited folders</strong>
 * Drag and drop pages, posts, and media library
-* Media replace - replace media files
+* Media replace - replace media files with out media replace feature
 * Folders icon colors - change the color of your folder icons. Change it for specific folders, or all folders
 * Import folders from other plugins and export Folders structure - import folders from FileBird, Enhanced Media Library, Wicked Folders, Real Media Library, and WP Media Folder. You can also export Folders strucutre
 * Keyboard shortcuts - do quick actions with your folders using keyboard shortcuts. For example, create new folders, rename folders, duplicate a folder, reorder folders, and much more
@@ -63,14 +63,14 @@ Upload text, images, videos, and audio. Then organize everything you upload into
 * Simultaneously assign and organize media, pages and posts while adding them to directories
 * Place content in multiple folders at once
 * Resize folders menu
-* Compatible with RTL admin panel (such as Hebrew, Arabic, etc.)
+* Compatible with RTL admin panel (such as Hebrew, Arabic & more)
 * Add and remove folders menu from pages, posts, and media
 * Minimize the folders area if you need extra space
 * Folders plugin is compatible with WPML
 
 = 🚀 FOLDERS PLUGIN PRO FEATURES =
 * <a href="https://premio.io/downloads/folders?utm_source=wporg" target="_blank" title="Folders pro plans"><strong>Upgrade to pro</strong></a> to get unlimited sub-folders :)
-* Create folders for each post type - use folders with other plugins that have custom post types (e.g. Elementor templates, WooCommerce & more)
+* Create folders for each post type - use folders with other plugins that have custom post types (e.g. Elementor templates, WooCommerce products & more)
 * Dynamic Folders - automatically filter posts, pages, custom posts, and media library files based on author, date, file size, file types, WooCommerce products & more
 * Delete unused media library files - using the Folders plugin, search for unused media files that take up unnecessary space on your server, and clean them with just a few clicks. Unused media library will be sorted from the biggest files to the smallest media library files
 * Organize your Plugins using Folders - create Folders for your plugins and organize them
@@ -93,7 +93,7 @@ Upload text, images, videos, and audio. Then organize everything you upload into
 * Sticky toolbar for the media library - navigate and organize your folders
 * Metadata details on Media Library hover - show useful metadata including title, size, type, date, dimension & more on hover
 * Customize the look and feel of your folders
-* Replace media for all file types - Replace any kind of files while uploading including PDF/SVG/DOCS/XLSX/etc
+* Replace media for all file types - Replace any kind of files while uploading including PDF, SVG, DOCX, XLSX, etc
 * Compare the new media library file with the old file when you replace media - compare old media library files with the new one and compare size, dimension & more
 * Folders user restriction - when enabled, users will only be able to access their folders and media. Only Admin users will be able to view all folders (can be enabled for the Dynamic Folders as well)
 * Move files to the trash by default before deleting
@@ -225,6 +225,10 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.0.7 =
+Improved design for the settings page
+Improved folder sorting flow
 
 = 3.0.6 =
 Folders loading bug fixed
