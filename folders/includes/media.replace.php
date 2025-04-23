@@ -905,11 +905,15 @@ class folders_replace_media {
      *
      */
     public function folders_admin_css_and_js($page) {
+        $minified = ".min";
+        if(IS_FOLDERS_DEVELOPER_MODE) {
+            $minified = "";
+        }
         if($page == "media_page_folders-replace-media" || $page == "admin_page_folders-replace-media") {
-            wp_enqueue_style('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/css/replace-media.min.css', [], WCP_FOLDER_VERSION);
+            wp_enqueue_style('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/css/replace-media'.esc_attr($minified).'.css', [], WCP_FOLDER_VERSION);
 
             wp_enqueue_script('folders-simpledropit', plugin_dir_url(dirname(__FILE__)) . 'assets/js/simpledropit.min.js', [], WCP_FOLDER_VERSION, true);
-            wp_enqueue_script('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/js/replace-media.js', [], WCP_FOLDER_VERSION, true);
+            wp_enqueue_script('folders-replace-media', plugin_dir_url(dirname(__FILE__)) . 'assets/js/replace-media'.esc_attr($minified).'.js', [], WCP_FOLDER_VERSION, true);
             $maxUploadSize = ini_get("upload_max_filesize");
             $maxUploadSize = str_replace(["K", "M", "G", "T", "P"],[" KB", " MB", " GB", " TB", " PB"], $maxUploadSize);
             $maxSize = sprintf(esc_html__("Maximum file size %1\$s", "folders"), $maxUploadSize);
