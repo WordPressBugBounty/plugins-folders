@@ -214,7 +214,7 @@ class WCP_Folders
         add_filter('folders_count_where_query', [$this, 'folders_count_where_query']);
         add_filter('folders_count_join_query', [$this, 'folders_count_join_query']);
 
-        add_action("wp_ajax_folder_update_status", [$this, 'folder_update_status']);
+        // add_action("wp_ajax_folder_update_status", [$this, 'folder_update_status']);
 
         // load language files
         add_action('plugins_loaded', [ $this, 'folders_text' ]);
@@ -306,7 +306,7 @@ class WCP_Folders
             $page = filter_input(INPUT_GET, 'page');
             if ($page == "recommended-folder-plugins" || $page == "folders-upgrade-to-pro") {
                 $is_shown = get_option("folder_update_message");
-                if ($is_shown === false) {
+                if ($is_shown === false && FOLDER_SIGNUP_CLASS::check_modal_status()) {
                     wp_redirect(admin_url("admin.php?page=wcp_folders_settings"));
                     exit;
                 }
@@ -6397,9 +6397,9 @@ class WCP_Folders
     {
         self::set_default_values_if_not_exists();
         // Only in Free, Get Folders update confirmation popup
-        $is_shown = get_option("folder_update_message");
-        if ($is_shown === false) {
-            include_once dirname(dirname(__FILE__))."/templates/admin/update.php";
+        $is_shown = FOLDER_SIGNUP_CLASS::check_modal_status();
+        if($is_shown) {   
+            include_once dirname(dirname(__FILE__))."/templates/admin/email-signup.php";
         } else {
             $setting_page = filter_input(INPUT_GET, 'setting_page');
             if (empty($setting_page)) {
