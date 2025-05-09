@@ -5517,8 +5517,8 @@ class WCP_Folders
             wp_enqueue_script('folders-slick', plugin_dir_url(dirname(__FILE__)).'assets/js/slick.min.js', ['jquery'], WCP_FOLDER_VERSION, true);
         }
 
-        $isShown = get_option("folder_update_message");
-        if ($isShown === false) {
+        $isShown = FOLDER_SIGNUP_CLASS::check_modal_status();
+        if ($isShown) {
             wp_enqueue_script('folders-mailcheck-js', plugin_dir_url(dirname(__FILE__)).'assets/js/mailcheck.js', ['jquery'], WCP_FOLDER_VERSION, true);
         }
 

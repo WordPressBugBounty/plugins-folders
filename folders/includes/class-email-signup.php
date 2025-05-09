@@ -89,7 +89,7 @@ class FOLDER_SIGNUP_CLASS {
      * @return bool Returns true if the modal should be displayed; otherwise, false.
      */
     public static function check_modal_status() { 
-        if(get_option(self::$update_message_option) == -1) {
+        if(get_option(self::$update_message_option) == -1 || get_option(self::$show_modal_name) == 2) {
             return false;
         } 
         $referer = isset($_SERVER['HTTP_REFERER']) ? sanitize_text_field($_SERVER['HTTP_REFERER']) : '';
@@ -98,7 +98,6 @@ class FOLDER_SIGNUP_CLASS {
 
            $default_folders = get_option("default_folders"); 
             if (!empty($default_folders) && is_array($default_folders)) {
-              
                 add_option(self::$show_modal_name, 1); 
             }
         }
