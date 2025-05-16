@@ -5042,7 +5042,6 @@ class WCP_Folders
         }
 
         if ($old_plugin_status == 1) {
-            update_option("folders_show_in_menu", "on");
             $old_plugin_var = get_option("folder_old_plugin_status");
             if (empty($old_plugin_var) || $old_plugin_var == null) {
                 update_option("folder_old_plugin_status", "1");
@@ -6329,8 +6328,8 @@ class WCP_Folders
 
         self::check_and_set_post_type();
 
-        $show_menu = get_option("folders_show_in_menu", true);
-        if ($show_menu == 'on' && !isset($customize_folders['folders_show_in_menu'])) {
+        $show_menu = get_option("folders_show_in_menu", false);
+        if ($show_menu === 'on' && !isset($customize_folders['folders_show_in_menu'])) {
             $customize_folders['folders_show_in_menu'] = 'yes';
             update_option("customize_folders", $customize_folders);
             delete_option("folders_show_in_menu");

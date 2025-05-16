@@ -107,10 +107,6 @@
             </div>
             <?php
             $customize_folders = get_option('customize_folders', []);
-            $show_menu = get_option("folders_show_in_menu", true);
-            if ($show_menu == 'on' && !isset($customize_folders['folders_show_in_menu'])) {
-                $customize_folders['folders_show_in_menu'] = 'yes';
-            }
             $max_upload_size = wp_max_upload_size();
             $max_upload_size = $max_upload_size / 1024 / 1024;
             $default = [
