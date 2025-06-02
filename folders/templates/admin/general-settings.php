@@ -54,7 +54,7 @@ if (! defined('ABSPATH')) {
                         e.preventDefault();
                         $(this).find("option:selected[value='folders-pro']").prop("selected", false);
                         $(this).trigger("change");
-                        window.open("<?php echo esc_url($this->getFoldersUpgradeURL()) ?>", "_blank");
+                        window.open(<?php echo json_encode($this->getFoldersUpgradeURL()); ?>, "_blank");
                     }
                     $(this).find("option:selected").each(function () {
                         $("#folders-for-" + $(this).attr("value")).removeClass("hide-option");
@@ -63,7 +63,7 @@ if (! defined('ABSPATH')) {
                 $(".folder-post-select").on("change", function () {
                     if ($(this).val() == "folders-pro") {
                         $(this).val("").trigger("change");
-                        window.open("<?php echo esc_url($this->getFoldersUpgradeURL()) ?>", "_blank");
+                        window.open(<?php echo json_encode($this->getFoldersUpgradeURL()); ?>, "_blank");
                     }
                 });
             <?php } ?>
@@ -97,26 +97,30 @@ if (! defined('ABSPATH')) {
             $("#save-settings").on("click", function(){
                 $("#setting-form #submit").trigger("click");
             });
-            const form = document.getElementById('setting-form');
-            let isFormDirty = false;
-            const formOldValues = $('#setting-form').serialize();
 
-            $(document).on("change", "#setting-form", function () {
-                isFormDirty = formOldValues !== $('#setting-form').serialize()
-            });
+            <?php if ($setting_page == "folder-settings" || $setting_page == "customize-folders") { ?>
+                const form = document.getElementById('setting-form');
+                let isFormDirty = false;
+                const formOldValues = $('#setting-form').serialize();
 
-            window.addEventListener('beforeunload', (event) => {
-                if (isFormDirty) {
-                    const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave this page?';
-                    event.returnValue = confirmationMessage;
-                    return confirmationMessage;
-                }
-            });
+                $(document).on("change", "#setting-form", function () {
+                    isFormDirty = formOldValues !== $('#setting-form').serialize()
+                });
 
-            // Reset isFormDirty on form submit
-            form.addEventListener('submit', () => {
-                isFormDirty = false;
-            });
+                window.addEventListener('beforeunload', (event) => {
+                    if (isFormDirty) {
+                        const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave this page?';
+                        event.returnValue = confirmationMessage;
+                        return confirmationMessage;
+                    }
+                });
+
+                // Reset isFormDirty on form submit
+                form.addEventListener('submit', () => {
+                    isFormDirty = false;
+                });
+            <?php } ?>
+
             $(document).on("click",".import-folders-button", function(e){
                 $("#import-folders-popup").show();
             });
@@ -144,13 +148,13 @@ if (! defined('ABSPATH')) {
                 if($(this).val() == "folders-pro") {
                     $(this).find("option").prop("selected", false);
                     $(this).find("option:first").prop("selected", true);
-                    window.open("<?php echo esc_url($this->getFoldersUpgradeURL()) ?>", "_blank");
+                    window.open(<?php echo json_encode($this->getFoldersUpgradeURL()); ?>, "_blank");
                 }
             });
             $(document).on("change", "#folder_font", function(){
                 if($(this).val() == "folders-pro") {
                     $(this).val("").trigger("change");
-                    window.open("<?php echo esc_url($this->getFoldersUpgradeURL()) ?>", "_blank");
+                    window.open(<?php echo json_encode($this->getFoldersUpgradeURL()); ?>, "_blank");
                 }
             });
             $(document).on("click",".view-shortcodes", function(e){
@@ -160,7 +164,7 @@ if (! defined('ABSPATH')) {
             $(document).on("change", "#folder_size", function(){
                 if($(this).val() == "folders-pro" || $(this).val() == "folders-pro-item" || $(this).val() == "folders-item-pro") {
                     $(this).val("16").trigger("change");
-                    window.open("<?php echo esc_url($this->getFoldersUpgradeURL()) ?>", "_blank");
+                    window.open(<?php echo json_encode($this->getFoldersUpgradeURL()); ?>, "_blank");
                 }
             });
             $(".accordion-header:first").trigger("click");
@@ -883,8 +887,7 @@ if (($option == "show" || get_option("folder_redirect_status") == 2) && $is_plug
             </div>
         </div>
     </div>
-</div>
-<?php require_once "help.php" ?>
+</div> 
 
 <div class="folder-popup-form" id="keyboard-shortcut">
     <div class="popup-form-content" style="padding: 20px 0 0;">

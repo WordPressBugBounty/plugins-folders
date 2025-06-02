@@ -2730,7 +2730,7 @@ class WCP_Folders
             $response['errors']  = [];
             $response['message'] = "";
             $errorArray          = [];
-            $errorMessage        = esc_html__("%\$s is required", 'folders');
+            $errorMessage        =  esc_html__("%1\$s is required", 'folders');
             $postData            = filter_input_array(INPUT_POST);
             if (!isset($postData['textarea_text']) || trim($postData['textarea_text']) == "") {
                 $error        = [
@@ -2743,7 +2743,7 @@ class WCP_Folders
             if (!isset($postData['user_email']) || trim($postData['user_email']) == "") {
                 $error        = [
                     "key"     => "user_email",
-                    "message" => sprintf($errorMessage, __("Email", 'folders')),
+                    "message" => sprintf($errorMessage, esc_attr__("Email", 'folders')),
                 ];
                 $errorArray[] = $error;
             } else if (!filter_var($postData['user_email'], FILTER_VALIDATE_EMAIL)) {
@@ -2755,14 +2755,14 @@ class WCP_Folders
             }
 
             if (empty($errorArray)) {
-                if (!isset($postData['folder_help_nonce']) || trim($postData['folder_help_nonce']) == "") {
+                if (!isset($postData['nonce']) || trim($postData['nonce']) == "") {
                     $error        = [
                         "key"     => "nonce",
                         "message" => esc_html__("Your request is not valid", 'folders'),
                     ];
                     $errorArray[] = $error;
                 } else {
-                    if (!wp_verify_nonce($postData['folder_help_nonce'], 'wcp_folder_help_nonce')) {
+                    if (!wp_verify_nonce($postData['nonce'], 'wcp_folder_help_nonce')) {
                         $error        = [
                             "key"     => "nonce",
                             "message" => esc_html__("Your request is not valid", 'folders'),
@@ -2825,7 +2825,7 @@ class WCP_Folders
                 $response['errors'] = $errorArray;
             }//end if
 
-            echo wp_json_encode($response);
+            wp_send_json($response);
         }//end if
 
     }//end wcp_folder_send_message_to_owner()
@@ -5899,7 +5899,7 @@ class WCP_Folders
     public function plugin_action_links($links)
     {
         array_unshift($links, '<a href="'.admin_url("admin.php?page=wcp_folders_settings").'" >'.esc_html__('Settings', 'folders').'</a>');
-        $links['need_help'] = '<a target="_blank" href="https://premio.io/help/folders/?utm_source=pluginspage" >'.__('Need help?', 'folders').'</a>';
+        $links['need_help'] = '<a target="_blank" href="https://wordpress.org/support/plugin/folders/" >'.__('Need help?', 'folders').'</a>';
 
         // PRO link for only for FREE
         $links['pro'] = '<a class="wcp-folder-upgrade-button" href="'.$this->getFoldersUpgradeURL().'" >'.__('Upgrade', 'folders').'</a>';
@@ -6097,6 +6097,25 @@ class WCP_Folders
 
     }//end getFoldersUpgradeURL()
 
+    /**
+     * Recommended Plugins URL
+     *
+     * @since  1.0.0
+     * @access public
+     * @return $url
+     */
+    function getFoldersRecommendedPluginsURL()
+    {
+        $customize_folders = get_option("customize_folders");
+        if (isset($customize_folders['show_folder_in_settings']) && $customize_folders['show_folder_in_settings'] == "yes") {
+            return admin_url("options-general.php?page=wcp_folders_settings&setting_page=recommended-folder-plugins");
+        } else {
+            return admin_url("admin.php?page=recommended-folder-plugins");
+        }
+
+    }//end getFoldersRecommendedPluginsURL()
+
+
 
     /**
      * Returns folders settings URL
@@ -6243,6 +6262,15 @@ class WCP_Folders
      */
     public function admin_menu()
     {
+        $getData = filter_input_array(INPUT_GET);
+        if (isset($getData['hide_folder_recommended_plugin']) && isset($getData['nonce'])) {
+            if (current_user_can('manage_options')) {
+                $nonce = $getData['nonce'];
+                if (wp_verify_nonce($nonce, "folder_recommended_plugin")) {
+                    update_option('hide_folder_recommended_plugin', "1");
+                }
+            }
+        }
         $customize_folders = get_option("customize_folders");
         if (isset($customize_folders['show_folder_in_settings']) && $customize_folders['show_folder_in_settings'] == "yes") {
             add_options_page(
@@ -6270,15 +6298,7 @@ class WCP_Folders
             $position   = 99;
             add_menu_page($page_title, $menu_title, $capability, $menu_slug, $callback, $icon_url, $position);
 
-            $getData = filter_input_array(INPUT_GET);
-            if (isset($getData['hide_folder_recommended_plugin']) && isset($getData['nonce'])) {
-                if (current_user_can('manage_options')) {
-                    $nonce = $getData['nonce'];
-                    if (wp_verify_nonce($nonce, "folder_recommended_plugin")) {
-                        update_option('hide_folder_recommended_plugin', "1");
-                    }
-                }
-            }
+           
 
             $recommended_plugin = get_option("hide_folder_recommended_plugin");
             if ($recommended_plugin === false) {
@@ -6407,6 +6427,9 @@ class WCP_Folders
             if($setting_page == "upgrade-to-pro") {
                 $hasBackButton = true;
                 include_once dirname(dirname(__FILE__)) . "/templates/admin/upgrade-to-pro.php";
+            }elseif($setting_page == "recommended-folder-plugins") {
+                $hasBackButton = true;
+                include_once dirname(dirname(__FILE__))."/templates/admin/recommended-plugins.php";
             } else {
                 $options = get_option('folders_settings');
                 $options = (empty($options) || !is_array($options)) ? [] : $options;

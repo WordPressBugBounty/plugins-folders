@@ -461,9 +461,9 @@ if ($data && ! is_wp_error($data)) {
                             if (! $tested_wp) {
                                 echo '<span class="compatibility-untested">'.esc_html__( 'Untested with your version of WordPress', "folders").'</span>';
                             } else if (! $compatible_wp) {
-                                echo '<span class="compatibility-incompatible">'.esc_html__( '<strong>Incompatible</strong> with your version of WordPress', "folders").'</span>';
+                                echo '<span class="compatibility-incompatible">'.wp_kses( '<strong>Incompatible</strong> with your version of WordPress', "folders").'</span>';
                             } else {
-                                echo '<span class="compatibility-compatible">'.esc_html__( '<strong>Compatible</strong> with your version of WordPress', "folders").'</span>';
+                                echo '<span class="compatibility-compatible">'.wp_kses( '<strong>Compatible</strong> with your version of WordPress', "folders").'</span>';
                             }
                             ?>
                         </div>
@@ -499,7 +499,7 @@ if ($data && ! is_wp_error($data)) {
                     buttons: {
                         "Hide it": {
                             click: function () {
-                                window.location = "<?php echo esc_url(admin_url('admin.php?page=wcp_folders_settings&hide_folder_recommended_plugin=1&nonce='.wp_create_nonce("folder_recommended_plugin")));?>";
+                                window.location = "<?php echo admin_url('admin.php?page=wcp_folders_settings&hide_folder_recommended_plugin=1&nonce='.wp_create_nonce("folder_recommended_plugin"));?>";
                             },
                             text: 'Hide it',
                             class: 'btn red-btn'
