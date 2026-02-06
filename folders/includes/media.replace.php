@@ -1180,7 +1180,9 @@ class folders_replace_media {
      */
     public function handle_folders_file_upload() {
         global $wpdb;
+ 
         if(isset($_FILES['new_media_file'])) {
+       
             if($_FILES['new_media_file']['error'] == 0) {
                 $attachment_id = isset($_GET['attachment_id']) ? sanitize_text_field($_GET['attachment_id']) : '';
                 $nonce = isset($_GET['nonce']) ? sanitize_text_field($_GET['nonce']) : '';
@@ -1191,6 +1193,12 @@ class folders_replace_media {
                 if (empty($attachment) || !isset($attachment->guid)) {
                     return;
                 }
+                
+                // Security: Check if current user has permission to edit this attachment
+                if (!current_user_can('edit_post', $attachment_id) || !current_user_can('upload_files')) {
+                    wp_die(esc_html__("Sorry, you don't have permission to replace this media file.", "folders"));
+                }
+ 
                 $attachment_url = $attachment->guid;
                 $url = wp_get_attachment_url($attachment_id);
                 if(!empty($url)) {
@@ -1218,12 +1226,12 @@ class folders_replace_media {
                     wp_die(esc_html__("Sorry, this file type is not permitted for security reasons", "folders"));
                 }
 
-                if(!in_array($ext, ['jpg', 'png', 'jpeg', 'gif', 'svg'])) {
-                    wp_die(esc_html__("Sorry, this file type is not permitted for security reasons", "folders"));
+                if(!in_array($ext, ['jpg', 'png', 'jpeg', 'gif', 'svg', 'webp'])) {
+                    wp_die(esc_html__("Only image files can be replaced.", "folders"));
                 }
 
-                if(!in_array($file['type'], ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])) {
-                    wp_die(esc_html__("Sorry, this file type is not permitted for security reasons", "folders"));
+                if(!in_array($file['type'], ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'])) {
+                    wp_die(esc_html__("Only image files can be replaced.", "folders"));
                 }
 
                 if($file_ext == "svg" || $file['type'] == 'image/svg+xml') {

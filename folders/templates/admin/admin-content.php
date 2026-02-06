@@ -64,6 +64,35 @@ if (!isset($customize_folders['default_icon_color']) || empty($customize_folders
 <?php if (!isset($customize_folders['bulk_organize_button_color']) || empty($customize_folders['bulk_organize_button_color'])) {
     $customize_folders['bulk_organize_button_color'] = "#f51366";
 } ?>
+
+
+/* Folders  Downlaod Pogress */
+
+.folder-rounded-progress svg circle { 
+    stroke: <?php echo esc_attr($customize_folders['new_folder_color']) ?> !important;
+}
+.folder-rounded-progress svg path,
+.folders-file-icon svg path { 
+    stroke: <?php echo esc_attr($customize_folders['new_folder_color']) ?> !important;
+}
+.folders-progress-completed {
+    background: linear-gradient(90deg, <?php echo esc_attr($customize_folders['new_folder_color']) ?> 0%, <?php echo esc_attr($customize_folders['new_folder_color']) ?> 100%) !important; 
+}
+.folders-progress-uploading {
+    background: linear-gradient(90deg, <?php echo esc_attr($customize_folders['new_folder_color']) ?> 0%, <?php echo esc_attr($customize_folders['new_folder_color']) ?> 100%) !important; 
+}
+.folders-status-completed {
+    color: <?php echo esc_attr($customize_folders['new_folder_color']) ?> !important;
+}
+.folders-file-name-clickable:hover {
+   color:  <?php echo esc_attr($customize_folders['new_folder_color']) ?>;
+}
+.folders-upload-close:hover {
+    background-color:  <?php echo esc_attr($customize_folders['new_folder_color']) ?>30 !important;
+}
+/* Folders  Downlaod Pogress */
+
+
 button.button.organize-button { background-color: <?php echo esc_attr($customize_folders['bulk_organize_button_color']) ?>; border-color: <?php echo esc_attr($customize_folders['bulk_organize_button_color']) ?>; }
 button.button.organize-button:hover { background-color: <?php echo esc_attr($customize_folders['bulk_organize_button_color']) ?>; border-color: <?php echo esc_attr($customize_folders['bulk_organize_button_color']) ?>; }
 <?php if (!isset($customize_folders['folder_bg_color']) || empty($customize_folders['folder_bg_color'])) {
@@ -170,7 +199,7 @@ if (!empty($post_type)) {
     if (empty($activeItem) || $activeItem == "") {
         $active_all_class = "active-item";
     }
-}
+} 
 $horClass = (!isset($customize_folders['enable_horizontal_scroll']) || $customize_folders['enable_horizontal_scroll'] == "on") ? "hor-scroll" : "";
 ?>
 <div id="wcp-content" class="<?php echo esc_attr(isset($display_status) && $display_status == "hide" ? "hide-folders-area" : "")  ?>" >
@@ -200,7 +229,7 @@ $horClass = (!isset($customize_folders['enable_horizontal_scroll']) || $customiz
                         <div class="folder-separator-2"></div>
                         <div class="folders-action-menu">
                             <ul>
-                                <li style="flex: 0 0 22px;"><a href="#" class="no-bg"><input type="checkbox" id="menu-checkbox" ></a></li>
+                                <li style="align-items: center; justify-content: center; vertical-align: middle; display: flex;"> <span class="no-bg full-width"><input type="checkbox" id="menu-checkbox" ></span></li>
                                 <li class="folder-inline-tooltip">
                                     <a class="full-width upload-media-action disabled" target="_blank" href="<?php echo esc_url($this->getFoldersUpgradeURL()) ?>">
                                         <span class="inline-tooltip"><?php esc_html_e("Uploading folder is pro feature", "folders"); ?> <span><?php esc_html_e("Upgrade Now 🎉", "folders") ?></span></span>

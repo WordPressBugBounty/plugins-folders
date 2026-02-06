@@ -2,18 +2,18 @@
 Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 3.0.0
-Tested up to: 6.8
-Stable tag: 3.1.3
+Tested up to: 6.9
+Stable tag: 3.1.6
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
-🔥 With the Folders WordPress plugin create unlimited folders, organize & manage your Media Library files, Pages & Posts in folders 📁
+Create unlimited folders with the Folders WordPress plugin, organize & manage your Media Library files, Pages & Posts in folders 📁
 
 == Description ==
 
 <a href="https://premio.io/help/folders/?utm_source=wordpressorg" target="_blank" title="Support">Support</a> | <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Demo</a> | <a href="https://premio.io/?utm_source=wordpressorg" target="_blank" title="WordPress plugins">Recommended Plugins</a> | <a href="https://premio.io/downloads/folders/?utm_source=wordpressorg" target="_blank" title="Folders Pro"><strong>Upgrade to Pro ⭐</strong></a>
 
-Create <strong>Unlimited Folders</strong> In The Free Version 🎉
+= Create <strong>Unlimited Folders</strong> with The Free Folders Plugin Version 🎉 =
 
 Folders is a WordPress plugin that enables users to organize all of their Pages, Posts, and Media files in folders. Easily drag and drop items into directories and change the folders tree view (hierarchy). Check out <a href="https://premio.io/downloads/folders" target="_blank" title="Folders pro plans"><strong>Folders Pro Plans</strong></a>.
 
@@ -32,12 +32,12 @@ Use Folders plugin to organize your WordPress content:
 
 <strong>Note:</strong> adding a page/post/image into a folder will not change its URL. The folders plugin creates virtual folders, it doesn't create actual folders in your server or WordPress installation.
 
-= ▶️ Folders Plugin Live Demo =
-A live demo for the Folders plugin is available at <a href="https://folders-demo.premio.io/wp-admin/" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
+= ▶️ Folders Plugin Demo =
+A demo of the Folders plugin is available at <a href="https://folders-demo.premio.io/wp-admin/" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 = 🛠️ So How Does the Folders plugin Work? =
 
-Upload text, images, videos, and audio. Then organize everything you upload into neat folders. For instance, create a media folder, content folder, and image folder, then have them all organized by date. It has a drag and drop interface, making it user-friendly for everyone. It’s like having your own media library at your own disposal. Create this media library for yourself or others.
+Upload pages, posts, images, videos, and audio. Then organize everything you upload into neat folders. For instance, create a media folder, content folder, and image folder, then have them all organized by date. It has a drag and drop interface, making it user-friendly for everyone. It’s like having your own media library at your own disposal. Create this media library for yourself or others.
 
 = 🔥 FOLDERS PLUGIN FEATURES =
 
@@ -59,7 +59,7 @@ Upload text, images, videos, and audio. Then organize everything you upload into
 * Bulk select and delete folders. Select one folder or more and delete it in the click of a button
 * While adding images or any kind of file from your media library to your pages and posts, use Folders to view all your media library files based on the folder the files are assigned to
 * Rename folders
-* Monitor all the unassigned media library files, posts, and page. Organize them easily to your folders
+* Monitor all the unassigned media library files, posts, and page & organize them to folders
 * Simultaneously assign and organize media, pages and posts while adding them to directories
 * Place content in multiple folders at once
 * Resize folders menu
@@ -225,6 +225,28 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.1.6 =
+Media library bugs fixed
+WP Media folder plugin bug fixed
+ASE plugin bug fixed
+Drag and drop bug fixed
+Manual data removal bug fixed
+
+= 3.1.5 =
+Fixed the following bugs:
+Compatibility issue with the W3 Total Cache plugin
+WebP files can now be replaced correctly
+
+= 3.1.4 =
+Added a download button on media items.
+Improved file upload UI - now includes progress display while uploading.
+Enhanced replace media behavior - when replacing a file, the title now updates alongside the filename.
+Mobile usability - the plugin is now scrollable and easier to use on mobile devices.
+Polylang compatibility - folder count now refreshes correctly when "All languages" is selected.
+Tutor LMS conflict - fixed compatibility issue with the Tutor LMS Certificate Builder.
+WordPress plugins page - resolved UI issues affecting the Folders interface in the plugins page.
+Error logs - fixed Folders-related errors appearing in server logs.
 
 = 3.1.3 =
 WordPress playground folders creation bug fixed
