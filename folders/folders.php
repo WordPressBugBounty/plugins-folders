@@ -117,7 +117,6 @@ WCP_Folders::get_instance();
 
 /* Affiliate Class*/
 if(is_admin()) {
-    include_once plugin_dir_path(__FILE__)."includes/class-affiliate.php";
     include_once plugin_dir_path(__FILE__) . "includes/class-review-box.php";
     include_once plugin_dir_path(__FILE__) . "includes/class-email-signup.php";
     include_once plugin_dir_path(__FILE__) . "includes/class-help.php";
