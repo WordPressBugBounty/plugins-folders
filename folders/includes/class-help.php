@@ -43,7 +43,7 @@ class FOLDERS_HELP extends WCP_Folders {
             'footer_menu' => array( 
                 'support' => array(
                     'title' => esc_html("Get Support", "folders"),
-                    'link' =>  esc_url("https://wordpress.org/support/plugin/folders/"),
+                    'link' =>  esc_url("https://premio.io/help/folders/"),
                     'status' => true,
                 ),
                 'upgrade_to_pro' => array(
@@ -65,7 +65,7 @@ class FOLDERS_HELP extends WCP_Folders {
                 ),
                 'get_support' => array(
                     'title' => esc_html("Get Support", "folders"),
-                    'link' =>   esc_url("https://wordpress.org/support/plugin/folders/"),
+                    'link' =>   esc_url("https://premio.io/help/folders/"),
                     'icon' => esc_url(WCP_FOLDER_URL."assets/images/help/help-circle.svg"),
                 ),
                 'contact' => array(

@@ -5841,7 +5841,7 @@ class WCP_Folders
     public function plugin_action_links($links)
     {
         array_unshift($links, '<a href="'.admin_url("admin.php?page=wcp_folders_settings").'" >'.esc_html__('Settings', 'folders').'</a>');
-        $links['need_help'] = '<a target="_blank" href="https://wordpress.org/support/plugin/folders/" >'.__('Need help?', 'folders').'</a>';
+        $links['need_help'] = '<a target="_blank" href="https://premio.io/help/folders/" >'.__('Need help?', 'folders').'</a>';
 
         // PRO link for only for FREE
         $links['pro'] = '<a class="wcp-folder-upgrade-button" href="'.$this->getFoldersUpgradeURL().'" >'.__('Upgrade', 'folders').'</a>';

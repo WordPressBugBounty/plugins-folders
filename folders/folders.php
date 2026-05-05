@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Folders
  * Description: Organize your Media library, Pages, and Posts into folders. You can easily drag and drop items into directories and change the folders tree view.
- * Version: 3.1.6
+ * Version: 3.1.7
  * Author: Premio
  * Author URI: https://premio.io/downloads/folders/
  * Text Domain: folders

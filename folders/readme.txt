@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 3.0.0
 Tested up to: 6.9
-Stable tag: 3.1.6
+Stable tag: 3.1.7
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -23,7 +23,7 @@ Folders is a WordPress plugin that enables users to organize all of their Pages,
 
 Use Folders plugin to organize your WordPress content:
 
-* Keep all of your media files organized in folders including photos, videos, music, main website pages, and blog posts. You can also organize media library files in multiple folders. 
+* Keep your media files organized in folders including photos, videos, music, main website pages, and blog posts. You can also organize media library files in multiple folders. 
 * Web developers: keep your clients’ website pages in proper order. Mark a folder with a star or give it a unique name for clients to understand what is important. 
 * Bloggers: manage your own content with ease with this file manager plugin. Organize photos and content by topics, categories, and/or dates. 
 * Quickly upload pages, media, and content to your WordPress and easily organize them into directories. 
@@ -36,11 +36,9 @@ Use Folders plugin to organize your WordPress content:
 A demo of the Folders plugin is available at <a href="https://folders-demo.premio.io/wp-admin/" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 = 🛠️ So How Does the Folders plugin Work? =
-
 Upload pages, posts, images, videos, and audio. Then organize everything you upload into neat folders. For instance, create a media folder, content folder, and image folder, then have them all organized by date. It has a drag and drop interface, making it user-friendly for everyone. It’s like having your own media library at your own disposal. Organize and manage your media library, posts and pages.
 
 = 🔥 FOLDERS PLUGIN FEATURES =
-
 * <strong>Create unlimited folders</strong>
 * Drag and drop pages, posts, and media library
 * Media replace - replace media files with out media replace feature
@@ -225,6 +223,9 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.1.7 =
+Improved support method
 
 = 3.1.6 =
 Media library bugs fixed
