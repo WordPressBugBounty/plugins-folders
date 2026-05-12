@@ -49,17 +49,16 @@ $data = WCP_FOLDER_FOOTER_HELP_DATA;
     
         <form action="<?php echo esc_url(admin_url('admin-ajax.php')) ?>" method="post" id="premio-help-form">
             <div class="premio-help-header">
-                <b>Gal Dubinski</b>  <?php esc_html_e("Co-Founder at Premio", "folders") ?>
+                <?php esc_html_e("Contact Us", "folders") ?>
             </div>
             <div class="premio-help-content">
-                <p><?php esc_html_e("Hello! Are you experiencing any problems with Folders? Please let me know :)", 'folders'); ?></p>
+                <p><?php esc_html_e("Are you experiencing any issues with Folders? Please let us know, we’d be happy to help 🙏", 'folders'); ?></p>
                    <br>
                 <div class="premio-form-field">
                     <input type="text" name="user_email" id="user_email" placeholder="<?php esc_html_e("Email", 'folders'); ?>">
-                 
                 </div>
                 <div class="premio-form-field">
-                    <textarea type="text" name="textarea_text" id="textarea_text" placeholder="<?php esc_html_e("How can I help you?", 'folders'); ?>"></textarea>
+                    <textarea type="text" name="textarea_text" id="textarea_text" placeholder="<?php esc_html_e("How can we help you?", 'folders'); ?>"></textarea>
                 </div>
                 <div class="form-button">
                     <button type="submit" class="premio-help-button-submit" ><?php esc_html_e("Chat", 'folders') ?></button>
@@ -67,11 +66,7 @@ $data = WCP_FOLDER_FOOTER_HELP_DATA;
                     <input type="hidden" id="nonce" name="nonce" value="<?php echo esc_attr(wp_create_nonce('wcp_folder_help_nonce')) ?>"  >
                 </div>
             </div>
-            <div class="help-form-footer">
-                <p><?php esc_html_e("Or", 'folders'); ?></p>
-                <p><a href="<?php echo esc_url($data['help_center_link']) ?>" target="_blank"><?php esc_html_e("Visit our Help Center >>", 'folders'); ?></a></p>
-            </div>
-        </form> 
+        </form>
         <div class="premio-form-response"></div>
     </div>
 </div>
