@@ -3179,6 +3179,11 @@ class WCP_Folders
             if (is_array($postArray)) {
                 $post_type = self::get_custom_post_type($type);
                 foreach ($postArray as $post) {
+                    if (!is_numeric($post) || $post <= 0) {
+                        continue;
+                    }
+                    $post = absint($post);
+
                     $terms      = get_the_terms($post, $post_type);
                     $post_terms = [
                         'post_id' => $post,

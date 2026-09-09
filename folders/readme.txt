@@ -1,9 +1,9 @@
 === Folders - Unlimited Folders to Organize Media Library Folder, Pages, Posts, File Manager ===
 Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
-Requires at least: 3.0.0
-Tested up to: 7.0
-Stable tag: 3.1.9
+Requires at least: 4.7
+Tested up to: 7.1
+Stable tag: 3.2.0
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -35,7 +35,7 @@ Use Folders plugin to organize your WordPress content:
 = ▶️ Folders Plugin Demo =
 A demo of the Folders plugin is available at <a href="https://folders-demo.premio.io/wp-admin/" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
-= 🛠️ So How Does the Folders plugin Work? =
+= 🛠️ How Does the Folders plugin Work? =
 Upload pages, posts, images, videos, and audio. Then organize everything you upload into neat folders. For instance, create a media folder, content folder, and image folder, then have them all organized by date. It has a drag and drop interface, making it user-friendly for everyone. It’s like having your own media library at your own disposal. Organize and manage your media library, posts and pages.
 
 = 🔥 FOLDERS PLUGIN FEATURES =
@@ -72,7 +72,7 @@ Upload pages, posts, images, videos, and audio. Then organize everything you upl
 * Dynamic Folders - automatically filter posts, pages, custom posts, and media library files based on author, date, file size, file types, WooCommerce products & more
 * Delete unused media library files - using the Folders plugin, search for unused media files that take up unnecessary space on your server, and clean them with just a few clicks. Unused media library will be sorted from the biggest files to the smallest media library files
 * Organize your Plugins using Folders - create Folders for your plugins and organize them
-* Set Email Notifications - stay informed with notifications whenever an action occurs on Folders — whether a new file is uploaded by a team member, a post is deleted, or any other change is made. Perfect for keeping track of updates.
+* Set Email Notifications - stay informed with notifications whenever an action occurs on Folders — whether a new file is uploaded by a team member, a post is deleted, or any other change is made.
 * Folders' icon colors
 * Download any media library folder as a ZIP: download any media library folder as a zip file
 * Sticky folders - pin your folders to the upper part of the folders navigation area. Use the sticky folders feature to make your most important folders accessible
@@ -88,8 +88,8 @@ Upload pages, posts, images, videos, and audio. Then organize everything you upl
 * Upload directly to a media library folder - upload images or any other kind of files to a specific folder
 * Select a default folder for your media library, posts, pages, and custom posts - select the folder that will load by default when you open your media library, pages, posts, and custom posts. E.g., show all the unassigned files whenever you open the media library
 * Create media library folders directly when you upload new media files
-* Sticky toolbar for the media library - navigate and organize your folders
-* Metadata details on Media Library hover - show useful metadata including title, size, type, date, dimension & more on hover
+* Sticky toolbar for the media library - navigate & organize your folders
+* Metadata details for Media Library files - title, size, type, date, dimension & more file information on hover
 * Customize the look and feel of your folders
 * Replace media for all file types - Replace any kind of files while uploading including PDF, SVG, DOCX, XLSX, etc
 * Compare the new media library file with the old file when you replace media - compare old media library files with the new one and compare size, dimension & more
@@ -223,6 +223,9 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.2.0 =
+Media replace bug fixed
 
 = 3.1.9 =
 PHP 8.4 deprecation warnings fixed

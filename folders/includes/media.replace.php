@@ -1619,7 +1619,12 @@ class folders_replace_media {
      *
      */
     function findAndReplaceContent($content, $search, $replace, $depth = false) {
-        $content = maybe_unserialize($content);
+        if ($depth === false && is_serialized($content)) {
+            $unserialized = @unserialize(trim($content), array('allowed_classes' => false));
+            if ($unserialized !== false || trim($content) === 'b:0;') {
+                $content = $unserialized;
+            }
+        }
 
         // Checking for JSON Data
         $isJson = $this->isJSON($content);
