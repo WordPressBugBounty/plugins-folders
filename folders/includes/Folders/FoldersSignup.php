@@ -138,10 +138,6 @@ class FoldersSignup {
 
                 // Signup Email for Chaty
                 $apiResponse = wp_safe_remote_post($url, ['body' => $apiParams, 'timeout' => 15, 'sslverify' => true]);
-
-                if (is_wp_error($apiResponse)) {
-                    wp_safe_remote_post($url, ['body' => $apiParams, 'timeout' => 15, 'sslverify' => false]);
-                }
             } else {
 
                 $next_date = date('Y-m-d', strtotime('+7 days'));

@@ -9,7 +9,7 @@ ob_start();
             <?php printf(esc_html__('Select the places where you want Folders to appear (Media Library, Posts, Pages, Custom Posts). Need help? Visit our %s', 'folders'), '<a href="https://premio.io/help/folders/?utm_source=wordpressfolders" target="_blank" class="text-primary! underline text-sm">' . esc_html__('help center', 'folders') . '</a>'); ?>
         </div>
         <div class="youtube-container">
-            <iframe src="https://www.youtube.com/embed/1SqDey4idlQ?rel=0"></iframe>
+            <iframe src="https://www.youtube.com/embed/gLBOSzCWUlU?rel=0"></iframe>
         </div>
     </div>
 <?php

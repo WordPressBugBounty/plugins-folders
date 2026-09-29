@@ -744,12 +744,15 @@ class MediaReplace
             if (!wp_verify_nonce($nonce, 'change_attachment_title_' . $postData['post_id'])) {
                 $errorCounter++;
                 $response['message'] = "Invalid request";
+            } else if (!current_user_can('edit_post', absint($postData['post_id']))) {
+                $errorCounter++;
+                $response['message'] = "Invalid request";
             }
         }
         if ($errorCounter == 0) {
             $response['status'] = 1;
 
-            $post_id = $postData['post_id'];
+            $post_id = absint($postData['post_id']);
 
             $post = get_post($post_id);
 
@@ -1529,7 +1532,7 @@ class MediaReplace
                 return $form_fields;
         }
 
-        if(current_user_can("upload_files")) {
+        if(current_user_can("upload_files") && current_user_can('edit_post', $post->ID)) {
             $form_fields["replace_file_name"] = array(
                 "label" => esc_html__("Replace media", "folders"),
                 "input" => "html",
@@ -1626,9 +1629,13 @@ class MediaReplace
                 if (!current_user_can("upload_files")) {
                     wp_die(esc_html__("You have not permission to upload files", 'folders'));
                 }
-                if (!isset($wpmime[$ext]) && !in_array($file['type'], $wpmime)) {
+                // Security: validate the real file type (extension + content), never trust the client-supplied MIME type.
+                $wp_filetype = wp_check_filetype_and_ext($file['tmp_name'], $file_name, $wpmime);
+                if (empty($wp_filetype['ext']) || empty($wp_filetype['type']) || !wp_match_mime_types($wp_filetype['type'], $wpmime)) {
                     wp_die(esc_html__("Sorry, this file type is not permitted for security reasons", 'folders'));
                 }
+                $ext = $file_ext = strtolower($wp_filetype['ext']);
+                $file['type'] = $wp_filetype['type'];
 
                 if (($file_ext == "svg" || $file['type'] == 'image/svg+xml') && function_exists('sanitizeSvgFileContent')) {
                     $status = sanitizeSvgFileContent($file['tmp_name']);
@@ -1689,13 +1696,13 @@ class MediaReplace
                 $this->old_file_path = $old_path . "/" . $file_parts['basename'];
 
                 if (!is_dir($base_path)) {
-                    mkdir($base_path, 755, true);
+                    wp_mkdir_p($base_path);
                 }
 
                 if (is_dir($base_path)) {
 
                     $file_array = explode(".", $file['name']);
-                    $file_ext = array_pop($file_array);
+                    array_pop($file_array);
                     $new_file_name = sanitize_title(implode(".", $file_array)) . "." . $file_ext;
                     if ($replacement_option == "replace_only_file") {
                         $new_file_name = $db_file_name;

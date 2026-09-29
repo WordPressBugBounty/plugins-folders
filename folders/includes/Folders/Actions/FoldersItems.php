@@ -49,6 +49,9 @@ class FoldersItems {
         $post_type = \Folders\Folders\Settings::get_folder_post_type($post_type);
         if (!empty($settings) && is_array($settings)) {
             foreach ($settings as $item) {
+                if (!isset($item['post_id']) || !current_user_can('edit_post', absint($item['post_id']))) {
+                    continue;
+                }
                 $terms = get_the_terms($item['post_id'], $post_type);
                 if (!empty($terms)) {
                     foreach ($terms as $term) {
@@ -209,7 +212,7 @@ class FoldersItems {
 
         $folderUndoSettings = [];
         foreach ($post_ids as $id) {
-            if (!empty($id) && is_numeric($id) && $id > 0) {
+            if (!empty($id) && is_numeric($id) && $id > 0 && current_user_can('edit_post', absint($id))) {
                 $terms = get_the_terms($id, $folder_type);
                 $post_terms = [
                     'post_id' => $id,
@@ -632,7 +635,7 @@ class FoldersItems {
 
         $folderUndoSettings = [];
         foreach ($post_ids as $post_id) {
-            if (!is_numeric($post_id) || $post_id <= 0) {
+            if (!is_numeric($post_id) || $post_id <= 0 || !current_user_can('edit_post', absint($post_id))) {
                 continue;
             }
             $terms = get_the_terms($post_id, $folder_type);
@@ -716,6 +719,9 @@ class FoldersItems {
         $post_ids = explode(",", $post_ids);
         $folderUndoSettings = [];
         foreach ($post_ids as $post_id) {
+            if (!is_numeric($post_id) || $post_id <= 0 || !current_user_can('edit_post', absint($post_id))) {
+                continue;
+            }
             $terms = get_the_terms($post_id, $folder_type);
             $post_terms = [
                 'post_id' => $post_id,

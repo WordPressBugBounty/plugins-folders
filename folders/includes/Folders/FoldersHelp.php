@@ -114,10 +114,6 @@ class FoldersHelp {
         // Sending message to Crisp API
         $crisp_response = wp_safe_remote_post("https://go.premio.io/crisp/crisp-send-message.php", ['body' => $api_params, 'timeout' => 15, 'sslverify' => true]);
 
-        if (is_wp_error($crisp_response)) {
-            wp_safe_remote_post("https://go.premio.io/crisp/crisp-send-message.php", ['body' => $api_params, 'timeout' => 15, 'sslverify' => false]);
-        }
-
         return array(
             'success'       => true,
             'message'       => esc_html__('Your message is sent successfully.', 'folders')
@@ -209,10 +205,6 @@ class FoldersHelp {
         ];
 
         $crisp_response = wp_safe_remote_post("https://go.premio.io/crisp/crisp-send-message.php", ['body' => $api_params, 'timeout' => 15, 'sslverify' => true]);
-
-        if (is_wp_error($crisp_response)) {
-            wp_safe_remote_post("https://go.premio.io/crisp/crisp-send-message.php", ['body' => $api_params, 'timeout' => 15, 'sslverify' => false]);
-        }
 
         return array(
             'success'       => true,
