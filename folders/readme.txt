@@ -17,7 +17,7 @@ Create unlimited folders with the Folders WordPress plugin, organize & manage yo
 
 Folders is a WordPress plugin that enables users to organize all of their Pages, Posts, and Media files in folders. Easily drag and drop items into directories and change the folders tree view (hierarchy). Check out <a href="https://premio.io/downloads/folders" target="_blank" title="Folders pro plans"><strong>Folders Pro Plans</strong></a>.
 
-[youtube  https://www.youtube.com/watch?v=1SqDey4idlQ]
+[youtube  https://www.youtube.com/watch?v=gLBOSzCWUlU]
 
 = 💪 How Folders Plugin Can Help You =
 
@@ -112,7 +112,7 @@ With the replace media files feature, users can select the file they want to rep
 Media replace feature allows for quick and easy replace media files process, without manually replacing each instance of the file on their website. Plus, with the ability to choose date options, users can easily maintain the context and relevance of their media files. 
 
 Media replace feature video:
-[youtube  https://www.youtube.com/watch?v=16MrxVo2EC4]
+[youtube  https://www.youtube.com/watch?v=lgfOuFH9xpw]
 
 = 📁 Bulk Organize The Media Library Files =
 The bulk organize media feature in Folders allows users to quickly and easily move multiple media files into folders at once. Using the intuitive drag-and-drop interface, users can select the files they want to move, drag them into the desired folder, and watch as the counter increases to indicate that the files have been successfully moved.
@@ -223,6 +223,12 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.2.1 =
+Enjoy a smoother, more intuitive Folders experience with refined interactions, clearer controls, and more reliable role-based permissions.
+Fixed scrollbar-related issues affecting the Folders, Media Library, and Plugins screens.
+Folder upload progress is now displayed correctly in the Media Library list view.
+Improved compatibility with the Deactivator plugin to prevent conflicts from disrupting the Folders interface.
 
 = 3.2.0 =
 Media replace bug fixed
