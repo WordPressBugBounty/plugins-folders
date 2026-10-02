@@ -33,6 +33,9 @@ class FoldersPosition {
         if(empty($folder_id) || empty($post_type) || empty($nonce) || !wp_verify_nonce($nonce, 'folder_nonce_' . $folder_id)) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
+        if (!\Folders\Folders\Settings::current_user_can_manage_folders()) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
 
         $folder_type = \Folders\Folders\Settings::get_folder_post_type($post_type);
 

@@ -52,6 +52,7 @@ class Assets {
         wp_enqueue_style( 'folders-select2', FOLDERS_PLUGIN_URL . 'dist/css/select2.css', array(), FOLDERS_VERSION );
         wp_enqueue_style( 'folders-spectrum', FOLDERS_PLUGIN_URL . 'dist/css/spectrum.css', array(), FOLDERS_VERSION );
         wp_enqueue_style( 'folders-fonts', FOLDERS_PLUGIN_URL . 'dist/css/folders-font.css', array(), FOLDERS_VERSION );
+        wp_enqueue_style('folders-deactivate-feedback', FOLDERS_PLUGIN_URL . 'dist/css/folders-feedback.css', array(), FOLDERS_VERSION);
         wp_enqueue_style( 'folders-settings', FOLDERS_PLUGIN_URL . 'dist/css/settings.css', array(), FOLDERS_VERSION );
         $hasValidKey = \Folders\Admin\License::is_license_active();
         $upgradeURL = \Folders\Admin\License::get_pro_url();

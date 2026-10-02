@@ -39,6 +39,9 @@ class FoldersCRUD
         if ( ! wp_verify_nonce( $nonce, 'folder_nonce_'.$type ) ) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
+        if (!\Folders\Folders\Settings::current_user_can_manage_folders()) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
 
         $status = isset( $params['status'] ) ? sanitize_text_field( $params['status'] ) : '';
         $status = $status ? 1 : 0;
@@ -92,6 +95,9 @@ class FoldersCRUD
         if ( ! wp_verify_nonce( $nonce, 'folder_nonce_'.$folder_id ) ) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
+        if (!\Folders\Folders\Settings::current_user_can_manage_folders()) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
 
         $folder_info = get_term_meta($folder_id, "folder_info", true);
 
@@ -133,18 +139,53 @@ class FoldersCRUD
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
 
+        self::remove_all_data();
+
+        add_option('folders_settings', ['page', 'post', 'attachment']);
+
+        return array(
+            'success'       => true,
+            'message'       => esc_html__('Folders deleted successfully', 'folders'),
+            'redirect_url'  => admin_url('admin.php?page=wcp_folders_settings')
+        );
+    }
+
+    /**
+     * Delete every folder for every post type and the plugin's settings.
+     *
+     * Does no permission checks: callers are responsible for them. Used by the
+     * "delete all data" tool and by `uninstall.php`, so it must not depend on
+     * any other plugin class.
+     *
+     * @return void
+     */
+    public static function remove_all_data()
+    {
         self::remove_folder_by_taxonomy("media_folder");
         self::remove_folder_by_taxonomy("folder");
         self::remove_folder_by_taxonomy("post_folder");
-        $post_types = get_post_types([], 'objects');
+
         $post_array = [
             "page",
             "post",
             "attachment",
         ];
-        foreach ($post_types as $post_type) {
-            if (!in_array($post_type->name, $post_array)) {
-                self::remove_folder_by_taxonomy($post_type->name . '_folder');
+
+        // Registered post types, plus the post types folders were enabled for
+        // (their post type may not be registered right now).
+        $post_types = array_keys(get_post_types([], 'objects'));
+        $enabled    = get_option('folders_settings');
+        if (is_array($enabled)) {
+            foreach ($enabled as $post_type) {
+                if (is_string($post_type) && $post_type !== '') {
+                    $post_types[] = $post_type;
+                }
+            }
+        }
+
+        foreach (array_unique($post_types) as $post_type) {
+            if (!in_array($post_type, $post_array)) {
+                self::remove_folder_by_taxonomy($post_type . '_folder');
             }
         }
 
@@ -154,14 +195,7 @@ class FoldersCRUD
         delete_option('premio_folders_settings');
         delete_option('hide_folders_media_cleaning_menu');
         delete_option('hide_folder_recommended_plugin');
-
-        add_option('folders_settings', ['page', 'post', 'attachment']);
-
-        return array(
-            'success'       => true,
-            'message'       => esc_html__('Folders deleted successfully', 'folders'),
-            'redirect_url'  => admin_url('admin.php?page=wcp_folders_settings')
-        );
+        delete_transient('premio_folders_without_trash');
     }
 
     /**
@@ -182,15 +216,27 @@ class FoldersCRUD
         $query   = $wpdb->prepare($query, $taxonomy);
         $folders = $wpdb->get_results($query);
         $folders = array_values($folders);
+        $removed = [];
         foreach ($folders as $folder) {
-            $term_id = intval($folder->term_id);
-            if ($term_id) {
-                $wpdb->delete($wpdb->prefix . 'term_relationships', ['term_taxonomy_id' => $term_id]);
-                $wpdb->delete($wpdb->prefix . 'term_taxonomy', ['term_id' => $term_id]);
-                $wpdb->delete($wpdb->prefix . 'terms', ['term_id' => $term_id]);
-                $wpdb->delete($wpdb->prefix . 'termmeta', ['term_id' => $term_id]);
-                wp_delete_term($term_id, $taxonomy);
+            $term_id          = intval($folder->term_id);
+            $term_taxonomy_id = intval($folder->term_taxonomy_id);
+            if ($term_id && $term_taxonomy_id) {
+                // term_relationships is keyed by term_taxonomy_id, which is not always equal to term_id.
+                $wpdb->delete($wpdb->term_relationships, ['term_taxonomy_id' => $term_taxonomy_id]);
+                $wpdb->delete($wpdb->term_taxonomy, ['term_taxonomy_id' => $term_taxonomy_id]);
+
+                // Only remove the term itself when no other taxonomy still uses it.
+                $still_used = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE term_id = %d", $term_id));
+                if (!$still_used) {
+                    $wpdb->delete($wpdb->terms, ['term_id' => $term_id]);
+                    $wpdb->delete($wpdb->termmeta, ['term_id' => $term_id]);
+                }
+                $removed[] = $term_id;
             }
+        }
+
+        if (!empty($removed)) {
+            clean_term_cache($removed, $taxonomy);
         }
     }
 

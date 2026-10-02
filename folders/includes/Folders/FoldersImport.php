@@ -97,14 +97,21 @@ class FoldersImport
 
                 foreach ($folders as $folder) {
                     $term_id = intval($folder->term_id);
+                    $term_taxonomy_id = isset($folder->term_taxonomy_id) ? intval($folder->term_taxonomy_id) : 0;
 
-                    if ($term_id) {
-                        $deleted[$term_id]['term_relationships'] = $wpdb->delete($wpdb->prefix . 'term_relationships', ['term_taxonomy_id' => $term_id]);
-                        $deleted[$term_id]['term_taxonomy'] = $wpdb->delete($wpdb->prefix . 'term_taxonomy', ['term_id' => $term_id]);
-                        $deleted[$term_id]['terms'] = $wpdb->delete($wpdb->prefix . 'terms', ['term_id' => $term_id]);
+                    if ($term_id && $term_taxonomy_id) {
+                        // term_relationships is keyed by term_taxonomy_id, which is not always equal to term_id.
+                        $deleted[$term_id]['term_relationships'] = $wpdb->delete($wpdb->term_relationships, ['term_taxonomy_id' => $term_taxonomy_id]);
+                        $deleted[$term_id]['term_taxonomy'] = $wpdb->delete($wpdb->term_taxonomy, ['term_taxonomy_id' => $term_taxonomy_id]);
 
-                        if ($plugin === 'folders') {
-                            $deleted[$term_id]['termmeta'] = $wpdb->delete($wpdb->prefix . 'termmeta', ['term_id' => $term_id]);
+                        // Only remove the term itself when no other taxonomy still uses it.
+                        $still_used = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE term_id = %d", $term_id));
+                        if (!$still_used) {
+                            $deleted[$term_id]['terms'] = $wpdb->delete($wpdb->terms, ['term_id' => $term_id]);
+
+                            if ($plugin === 'folders') {
+                                $deleted[$term_id]['termmeta'] = $wpdb->delete($wpdb->termmeta, ['term_id' => $term_id]);
+                            }
                         }
                     }
                 }

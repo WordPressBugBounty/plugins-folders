@@ -53,6 +53,9 @@ class FoldersState {
         if(empty($post_type) || empty($nonce) || !wp_verify_nonce($nonce, 'folder_nonce_'.$post_type)) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
+        if (!\Folders\Folders\Settings::current_user_can_use_folders($post_type)) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
 
         $status = isset( $params['status'] ) ? sanitize_text_field( $params['status'] ) : '';
 
@@ -80,6 +83,9 @@ class FoldersState {
         $menu_width = isset( $params['menu_width'] ) ? intval(sanitize_text_field( $params['menu_width'] )) : '';
 
         if(empty($post_type) || empty($nonce) || empty($menu_width) || !is_numeric($menu_width) || !wp_verify_nonce($nonce, 'folder_nonce_'.$post_type)) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
+        if (!\Folders\Folders\Settings::current_user_can_use_folders($post_type)) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
 

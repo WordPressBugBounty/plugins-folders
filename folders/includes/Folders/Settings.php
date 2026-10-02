@@ -81,6 +81,43 @@ class Settings {
     }
 
     /**
+     * Check whether the current user may change the folder structure
+     * (create, move, sort, lock, color or copy folders).
+     *
+     * Matches the `manage_categories` capability the folder taxonomies are
+     * registered with.
+     *
+     * @return bool
+     */
+    public static function current_user_can_manage_folders() {
+        return current_user_can('manage_categories');
+    }
+
+    /**
+     * Check whether the current user may use the folder sidebar for a post type
+     * (open and collapse folders, resize or hide the sidebar).
+     *
+     * @param string $post_type Post type the sidebar belongs to. Optional.
+     * @return bool
+     */
+    public static function current_user_can_use_folders($post_type = '') {
+        if (self::current_user_can_manage_folders()) {
+            return true;
+        }
+
+        if ($post_type === 'attachment' || $post_type === 'media') {
+            return current_user_can('upload_files') || current_user_can('edit_posts');
+        }
+
+        $post_type_object = !empty($post_type) ? get_post_type_object($post_type) : null;
+        if ($post_type_object && isset($post_type_object->cap->edit_posts)) {
+            return current_user_can($post_type_object->cap->edit_posts);
+        }
+
+        return current_user_can('edit_posts') || current_user_can('upload_files');
+    }
+
+    /**
      * Check whether the folder sidebar should be shown on the current screen.
      *
      * True on the list screen (or Media Library) of a folder-enabled post type.
@@ -88,8 +125,15 @@ class Settings {
      *
      * @return bool
      */
-    public static function is_folders_active() {
+    public static function is_folders_active($post_type = '') {
         global $typenow;
+        if(empty($post_type)) {
+            $post_type = $typenow;
+        }
+
+        if($post_type == 'shop_order') {
+            return false;
+        }
 
         if (($typenow == "attachment" || $typenow == "media") && (isset($_REQUEST['attachment-filter']) && $_REQUEST['attachment-filter'] == "trash")) {
             return false;

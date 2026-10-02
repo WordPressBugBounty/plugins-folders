@@ -50,6 +50,11 @@ class FoldersRestApi {
             '/download-media-items' => 'download_media_items',
         ];
 
+        // Dynamic folders are only available when their handler class is part of the plugin.
+        if ( ! class_exists( '\Folders\Folders\DynamicFolders' ) ) {
+            unset( $actions['/save-dynamic-folder-state'] );
+        }
+
         foreach ($actions as $route => $action) {
             register_rest_route( 'folders-settings/v1', $route, array(
                 'methods'             => 'POST',

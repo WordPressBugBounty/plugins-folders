@@ -46,7 +46,6 @@ class Deactivate {
         global $pagenow;
         if($pagenow === 'plugins.php' && current_user_can('manage_options')) {
             wp_enqueue_style('folders-deactivate-feedback', FOLDERS_PLUGIN_URL . 'dist/css/folders-feedback.css', array(), FOLDERS_VERSION);
-            wp_enqueue_style('folders-settings', FOLDERS_PLUGIN_URL . 'dist/css/settings.css', array(), FOLDERS_VERSION);
             wp_enqueue_script('folders-deactivate-feedback', FOLDERS_PLUGIN_URL . 'dist/js/folders-feedback.js', array('jquery'), FOLDERS_VERSION, true);
             wp_localize_script(
                 'folders-deactivate-feedback',
@@ -64,21 +63,17 @@ class Deactivate {
     /**
      * Run deactivation tasks.
      *
-     * Deletes all folder data when the "remove folders when removed" advanced
-     * setting is enabled. Requires the `activate_plugins` capability.
+     * Deactivating keeps all folders and settings. When the "remove folders
+     * when removed" advanced setting is enabled, the data is deleted only when
+     * the plugin itself is deleted, by `uninstall.php`.
      *
      * @return void
      */
     public function deactivate() {
-        if(!current_user_can('activate_plugins')) {
-            return;
+        // Remove temporary download archives and their cleanup event.
+        if (class_exists('\Folders\Media\MediaDownload')) {
+            \Folders\Media\MediaDownload::cleanup_expired_archives(true);
         }
-        $status = \Folders\Admin\Settings::get_field_settings( 'advanced_settings', 'remove_folders_when_removed' );
-        if($status || $status == 'on') {
-            $params = [
-                'nonce' => wp_create_nonce('delete-folders-plugin-data-manually'),
-            ];
-            \Folders\Folders\Actions\FoldersCRUD::delete_all_folder($params);
-        }
+        wp_clear_scheduled_hook('folders_cleanup_download_archives');
     }
 }

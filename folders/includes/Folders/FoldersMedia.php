@@ -37,12 +37,13 @@ class FoldersMedia {
      */
     public function output_backbone_view_filters()
     {
-        error_log('ssssss');
         if (!\Folders\Folders\Settings::check_for_folder('attachment')) {
             return;
         }
-        error_log('ssssss');
         global $typenow, $current_screen;
+        if($typenow == 'dlm_download') {
+            return;
+        }
         $isAjax = (defined('DOING_AJAX') && DOING_AJAX) ? 1 : 0;
         $options = get_option('folders_settings');
         $options = (empty($options) || !is_array($options)) ? [] : $options;
@@ -114,15 +115,12 @@ class FoldersMedia {
             return;
         }
 
-        error_log('ssss');
-
         if ($typenow == "attachment") {
 
             self::add_media_scripts();
 
 
-        } else if (!\Folders\Folders\Settings::is_folders_active() && \Folders\Folders\Settings::get_folder_post_type('attachment')) {
-            // Free/Pro URL Change
+        } else if (!\Folders\Folders\Settings::is_folders_active('attachment') && \Folders\Folders\Settings::get_folder_post_type('attachment')) {
             global $current_screen;
 
             $status = apply_filters("check_media_status_for_folders", true);
@@ -282,8 +280,6 @@ class FoldersMedia {
         );
         // Free/Pro URL Change
         wp_enqueue_style('folders-media', FOLDERS_PLUGIN_URL . 'dist/css/media.css', [], FOLDERS_VERSION);
-        // Media Progress Style
-        wp_enqueue_style('folders-media-progress', FOLDERS_PLUGIN_URL .'dist/css/progress.css', array(), FOLDERS_VERSION);
     }
 
     /**
@@ -298,13 +294,11 @@ class FoldersMedia {
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/add-folder.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/rename-folder.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/delete-folder.php';
-        include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/duplicate-folder.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/footer-loader.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/remove-post-from-folder.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/notifications.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/delete-multiple-folders.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/select-folders-modal.php';
-        include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/lock-folders-modal.php';
         include_once FOLDERS_TEMPLATE_DIR . 'folders/modals/bulk-action-modal.php';
 
         $shortcut_status = \Folders\Admin\Settings::get_field_settings('general_settings', 'use_shortcuts');

@@ -32,6 +32,19 @@ class FoldersState {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
 
+        // Work out which post type the folder belongs to, to check the matching capability.
+        $post_type = '';
+        $term = is_numeric($folder_id) ? get_term((int) $folder_id) : null;
+        if ($term && !is_wp_error($term)) {
+            $taxonomy = get_taxonomy($term->taxonomy);
+            if ($taxonomy && !empty($taxonomy->object_type)) {
+                $post_type = reset($taxonomy->object_type);
+            }
+        }
+        if (!\Folders\Folders\Settings::current_user_can_use_folders($post_type)) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
+
         $folder_info = get_term_meta($folder_id, "folder_info", true);
         $status = $status ? 1 : 0;
 

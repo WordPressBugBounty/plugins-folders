@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 4.7
 Tested up to: 7.1
-Stable tag: 3.2.2
+Stable tag: 3.2.3
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -223,6 +223,14 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.2.3 =
+Fixed extra spacing above plugin update notices
+Fixed media library scrolling issues that prevented viewing all images
+Fixed an unexpected reordering column appearing in WooCommerce orders
+Fixed a conflict with Download Monitor that prevented uploaded files from being attached and protected
+Fixed missing Add/Edit Gallery controls and issues uploading or selecting gallery images
+Fixed existing images being removed from galleries when updating a filtered selection
 
 = 3.2.2 =
 Media upload bug fixed

@@ -12,7 +12,27 @@ defined( 'ABSPATH' ) || exit;
  */
 class FoldersItems {
 
-    var $transient_data = null;
+    /**
+     * Cached folder item counts for the current request, keyed by term_taxonomy_id.
+     * Null until loaded from the `premio_folders_without_trash` transient.
+     *
+     * @var array|false|null
+     */
+    private static $transient_data = null;
+
+    /**
+     * Clear the cached folder item counts (the transient and the in-request copy).
+     *
+     * Call this whenever posts are added to or removed from folders, or a post's
+     * status changes, so the counts are recalculated on the next folder list load.
+     *
+     * @return void
+     */
+    public static function flush_count_cache()
+    {
+        delete_transient("premio_folders_without_trash");
+        self::$transient_data = null;
+    }
 
     /**
      * Register the `get_terms` filter that adds item counts to folder terms.
@@ -72,7 +92,7 @@ class FoldersItems {
                 }
             }
 
-            delete_transient("premio_folders_without_trash");
+            self::flush_count_cache();
         }
 
         return array(
@@ -101,6 +121,9 @@ class FoldersItems {
 
         if(empty($post_type) || empty($order_field) || empty($nonce) || !wp_verify_nonce($nonce, 'folder_nonce_'.$post_type)) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
+        if (!\Folders\Folders\Settings::current_user_can_manage_folders()) {
+            return new \WP_Error( 'error', esc_html__('You do not have permission to sort folders', 'folders'), array( 'status' => 403 ) );
         }
 
         $folder_type = \Folders\Folders\Settings::get_folder_post_type($post_type);
@@ -228,7 +251,7 @@ class FoldersItems {
         }
 
         delete_transient("folder_undo_settings");
-        delete_transient("premio_folders_without_trash");
+        self::flush_count_cache();
         set_transient("folder_undo_settings", $folderUndoSettings, DAY_IN_SECONDS);
         return array(
             'success'       => true
@@ -250,6 +273,9 @@ class FoldersItems {
         $post_type = isset( $params['post_type'] ) ? sanitize_text_field( $params['post_type'] ) : '';
 
         if(empty($post_type) || empty($nonce) || !wp_verify_nonce($nonce, 'folder_nonce_'.$post_type)) {
+            return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
+        }
+        if (!\Folders\Folders\Settings::current_user_can_use_folders($post_type)) {
             return new \WP_Error( 'error', esc_html__('Invalid request', 'folders'), array( 'status' => 403 ) );
         }
 
@@ -280,7 +306,6 @@ class FoldersItems {
      */
     public function get_terms_filter_without_trash($terms, $taxonomies, $args)
     {
-        delete_transient("premio_folders_without_trash");
         $isForFolders = 0;
         if (!empty($taxonomies) && is_array($taxonomies) && count($taxonomies)) {
             foreach ($taxonomies as $taxonomy) {
@@ -305,11 +330,11 @@ class FoldersItems {
                 return $terms;
             }
 
-            if($this->transient_data === null) {
-                $this->transient_data = get_transient("premio_folders_without_trash");
+            if(self::$transient_data === null) {
+                self::$transient_data = get_transient("premio_folders_without_trash");
             }
 
-            $trash_folders = $initial_trash_folders = $this->transient_data;
+            $trash_folders = $initial_trash_folders = self::$transient_data;
 
             if ($trash_folders === false) {
                 $trash_folders = array();
@@ -382,7 +407,7 @@ class FoldersItems {
             if (!empty($terms) && $initial_trash_folders != $trash_folders) {
                 delete_transient("premio_folders_without_trash");
                 set_transient("premio_folders_without_trash", $trash_folders, 3 * DAY_IN_SECONDS);
-                $this->transient_data = $trash_folders;
+                self::$transient_data = $trash_folders;
             }
         }
         return $terms;

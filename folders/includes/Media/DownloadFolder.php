@@ -17,8 +17,10 @@ class DownloadFolder
     /**
      * Add the next batch of a folder's attachments to the folder's ZIP archive.
      *
-     * The archive is stored in `uploads/folders-files/{folder-slug}.zip` and is
-     * recreated when page 1 is requested. Only attachments directly in the
+     * The archive is stored in `uploads/folders-files/` under a name that cannot
+     * be guessed (folder slug plus a token tied to the user and request), is
+     * recreated when page 1 is requested and is deleted about an hour later.
+     * Only attachments directly in the
      * folder (not in subfolders) are included. Requires the `upload_files`
      * capability.
      *
@@ -95,20 +97,32 @@ class DownloadFolder
             $file_array[] = get_attached_file($post->ID);
         }
 
-        $zip_file = FoldersCRUD::create_slug_from_string($term->name) . ".zip";
+        // The file name must stay the same for every page of one download, but must not
+        // be guessable: the archive sits in the uploads directory until it expires.
+        $zip_slug = FoldersCRUD::create_slug_from_string($term->name);
+        if ($zip_slug === '') {
+            $zip_slug = 'folder';
+        }
+        $zip_token = substr(wp_hash('folders-download|' . $folder_id . '|' . get_current_user_id() . '|' . $nonce), 0, 20);
+        $zip_file = $zip_slug . "-" . $zip_token . ".zip";
 
         $folder_path = wp_upload_dir();
         $folderPath = $folder_path['basedir'] . DIRECTORY_SEPARATOR . "folders-files";
-        if (!is_dir($folderPath)) {
-            mkdir($folderPath);
+        if (!MediaDownload::prepare_directory($folderPath)) {
+            return new \WP_Error( 'error', esc_html__('Error during creating zip file', 'folders'), array( 'status' => 403 ) );
         }
 
         $zip_path = $folderPath . DIRECTORY_SEPARATOR . $zip_file;
 
         ini_set('max_execution_time', 0);
 
-        if ($page == 1 && file_exists($zip_path)) {
-            @unlink($zip_path);
+        if ($page == 1) {
+            // Remove expired archives left by earlier downloads.
+            MediaDownload::cleanup_old_files($folderPath);
+
+            if (file_exists($zip_path)) {
+                @unlink($zip_path);
+            }
         }
 
         $fileURL = $folder_path['baseurl'] . "/folders-files/" . $zip_file;
@@ -126,6 +140,8 @@ class DownloadFolder
         }
 
         $zip->close();
+
+        MediaDownload::schedule_cleanup();
 
         $response = [];
         $response['file_url'] = $fileURL;
