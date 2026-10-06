@@ -4,6 +4,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 global $typenow;
 $post_type = $typenow;
+if(isset($folder_post_type) && !empty($folder_post_type)){
+    $post_type = sanitize_text_field($folder_post_type);
+} else {
+    $post_type = $typenow;
+}
 if(isset($_GET['post_type']) && !empty($_GET['post_type'])){
     $post_type = sanitize_text_field($_GET['post_type']);
 }
@@ -13,12 +18,12 @@ $empty_item_status = isset($_GET[$folder_type]) && $_GET[$folder_type] == -1 ? t
 $has_horizontal_scroll = \Folders\Admin\Settings::get_field_settings( 'customization_settings', 'enable_horizontal_scroll' );
 $status = get_option('wcp_dynamic_display_status_'. $post_type);
 
-$title = ucfirst($typenow);
-if ($typenow == "page") {
+$title = ucfirst($post_type);
+if ($post_type == "page") {
     $title = "Pages";
-} else if ($typenow == "post") {
+} else if ($post_type == "post") {
     $title = "Posts";
-} else if ($typenow == "attachment") {
+} else if ($post_type == "attachment") {
     $title = "Files";
 } else {
     $postType = $typenow;

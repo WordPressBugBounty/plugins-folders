@@ -158,6 +158,7 @@ class FoldersMedia {
                 wp_dequeue_script("jquery-jstree");
                 // CMS Tree Page View Conflict
                 $folder_post_type = 'attachment';
+                $post_type = 'attachment';
                 ob_start();
                 include_once FOLDERS_TEMPLATE_DIR . "folders" . WCP_DS . "sidebar.php";
                 $form_content = ob_get_clean();

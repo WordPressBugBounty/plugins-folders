@@ -435,7 +435,10 @@ class FoldersAssets {
         if(empty($folder_font)) {
             $folder_font = 'Inter';
         }
-
+        $width = intval($width);
+        if($width > 500) {
+            $width = 500;
+        }
         $custom_css = ':root {';
         $custom_css .= '--add-folder-button-color: ' . esc_attr($settings['new_folder_color'] ? $settings['new_folder_color'] : '#FA166B') . ';';
         $custom_css .= '--add-folder-dropdown-border-color: ' . esc_attr($settings['dropdown_color'] ? $settings['dropdown_color'] : '#484848') . ';';

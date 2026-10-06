@@ -146,11 +146,15 @@ class Settings {
 
         global $current_screen;
 
-        if (self::check_for_folder($typenow) && ('edit' == $current_screen->base || 'upload' == $current_screen->base)) {
+        // There is no current screen on front-end, REST and some page-builder
+        // requests, so never read ->base from it directly.
+        $screen_base = isset($current_screen->base) ? $current_screen->base : '';
+
+        if (self::check_for_folder($typenow) && ('edit' == $screen_base || 'upload' == $screen_base)) {
             return true;
         }
 
-        if (empty($typenow) && (isset($current_screen->base) && 'upload' == $current_screen->base)) {
+        if (empty($typenow) && 'upload' == $screen_base) {
             if (self::check_for_folder("attachment")) {
                 return true;
             }
