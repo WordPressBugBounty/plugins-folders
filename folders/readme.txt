@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 4.7
 Tested up to: 7.1
-Stable tag: 3.2.5
+Stable tag: 3.2.6
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -223,6 +223,9 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.2.6 =
+Fixed compatibility issues with Media Library Assistant and Rank Math SEO.
 
 = 3.2.5 =
 Fixed an issue in Divi Builder where folder contents stopped appearing when reopening the image picker

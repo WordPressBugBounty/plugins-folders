@@ -322,6 +322,17 @@ class FoldersMedia {
     public function filter_attachments_grid($args)
     {
         $taxonomy = 'media_folder';
+
+        // Some plugins answer the attachments request with their own handler
+        // and keep only the query arguments they know - Media Library
+        // Assistant does this whenever its Media Library enhancements are on.
+        // They still run this filter, so take the selected folder from the
+        // original request when it has been dropped.
+        if (!isset($args[$taxonomy]) && wp_doing_ajax() && isset($_REQUEST['query']) && is_array($_REQUEST['query'])
+            && isset($_REQUEST['query'][$taxonomy]) && is_scalar($_REQUEST['query'][$taxonomy])) {
+            $args[$taxonomy] = sanitize_text_field(wp_unslash($_REQUEST['query'][$taxonomy]));
+        }
+
         if (!isset($args[$taxonomy])) {
             return $args;
         }
