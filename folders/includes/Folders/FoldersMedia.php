@@ -40,6 +40,13 @@ class FoldersMedia {
         if (!\Folders\Folders\Settings::check_for_folder('attachment')) {
             return;
         }
+        // Themes and plugins also load the media modal for visitors and for
+        // users who cannot browse the Media Library (for example on profile
+        // or front-end forms). The folder panel is of no use to them, so skip
+        // building it.
+        if (!is_user_logged_in() || !current_user_can('upload_files')) {
+            return;
+        }
         global $typenow, $current_screen;
         if($typenow == 'dlm_download') {
             return;
@@ -173,7 +180,7 @@ class FoldersMedia {
                         'folders_settings',
                         [
                             'folders' => $folders,
-                            'folders_tree' => $folders_tree,
+                            'folders_tree' => \Folders\Folders\FoldersTree::slim_tree($folders_tree),
                             'ajax_url' => admin_url('admin-ajax.php'),
                             'rest_url' => get_rest_url(null, 'folders-settings/v1/'),
                             'rest_nonce' => wp_create_nonce('wp_rest'),
@@ -254,7 +261,7 @@ class FoldersMedia {
                 'folders-media-file',
                 'folders_media_options',
                 [
-                        'terms' => $folders,
+                        'terms' => \Folders\Folders\FoldersTree::slim_tree($folders),
                         'taxonomy' => get_taxonomy('media_folder'),
                         'ajax_url' => admin_url("admin-ajax.php"),
                         'post_type' => $post_type,

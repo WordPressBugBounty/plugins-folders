@@ -13,26 +13,28 @@ defined( 'ABSPATH' ) || exit;
 class FoldersItems {
 
     /**
-     * Cached folder item counts for the current request, keyed by term_taxonomy_id.
-     * Null until loaded from the `premio_folders_without_trash` transient.
-     *
-     * @var array|false|null
+     * Name of the transient that caches folder item counts.
      */
-    private static $transient_data = null;
+    const COUNT_CACHE = 'premio_folders_without_trash';
 
     /**
-     * Clear the cached folder item counts (the transient and the in-request copy).
-     *
-     * Call this whenever posts are added to or removed from folders, or a post's
-     * status changes, so the counts are recalculated on the next folder list load.
-     *
-     * @return void
+     * Version of the count cache layout. A cache saved in another layout is ignored.
      */
-    public static function flush_count_cache()
-    {
-        delete_transient("premio_folders_without_trash");
-        self::$transient_data = null;
-    }
+    const COUNT_CACHE_VERSION = 2;
+
+    /**
+     * In-request copy of the count cache.
+     *
+     * @var array|null
+     */
+    private static $count_cache = null;
+
+    /**
+     * Folder taxonomies of the folder-enabled post types, for this request.
+     *
+     * @var string[]|null
+     */
+    private static $folder_taxonomies = null;
 
     /**
      * Register the `get_terms` filter that adds item counts to folder terms.
@@ -40,6 +42,249 @@ class FoldersItems {
     public function __construct()
     {
         add_filter('get_terms', [$this, 'get_terms_filter_without_trash'], 10, 3);
+
+        // Whenever the count cache is deleted, forget the copy kept for this request too.
+        add_action('delete_transient_' . self::COUNT_CACHE, [__CLASS__, 'reset_count_cache']);
+    }
+
+    /**
+     * Forget the in-request copy of the folder count cache.
+     *
+     * @return void
+     */
+    public static function reset_count_cache()
+    {
+        self::$count_cache = null;
+    }
+
+    /**
+     * Read the count cache.
+     *
+     * Layout: `['version' => 2, 'tax' => [taxonomy => [key => value]]]`, where
+     * a key is "terms", "unassigned" or "total" plus the count context (for
+     * example the admin language).
+     *
+     * @return array
+     */
+    private static function get_count_cache()
+    {
+        if (self::$count_cache === null) {
+            $cache = get_transient(self::COUNT_CACHE);
+            if (!is_array($cache) || !isset($cache['version']) || $cache['version'] !== self::COUNT_CACHE_VERSION || !isset($cache['tax']) || !is_array($cache['tax'])) {
+                $cache = ['version' => self::COUNT_CACHE_VERSION, 'tax' => []];
+            }
+            self::$count_cache = $cache;
+        }
+        return self::$count_cache;
+    }
+
+    /**
+     * Save one value in the count cache.
+     *
+     * @param string $taxonomy Folder taxonomy.
+     * @param string $key      Cache key within the taxonomy.
+     * @param mixed  $value    Value to store.
+     * @return void
+     */
+    public static function set_count_cache($taxonomy, $key, $value)
+    {
+        $cache = self::get_count_cache();
+        $cache['tax'][$taxonomy][$key] = $value;
+        self::$count_cache = $cache;
+        set_transient(self::COUNT_CACHE, $cache, 3 * DAY_IN_SECONDS);
+    }
+
+    /**
+     * Read one value from the count cache.
+     *
+     * @param string $taxonomy Folder taxonomy.
+     * @param string $key      Cache key within the taxonomy.
+     * @return mixed|null The value, or null when it is not cached.
+     */
+    public static function get_cached_count($taxonomy, $key)
+    {
+        $cache = self::get_count_cache();
+        return isset($cache['tax'][$taxonomy][$key]) ? $cache['tax'][$taxonomy][$key] : null;
+    }
+
+    /**
+     * Clear cached counts.
+     *
+     * Pass a folder taxonomy to clear only its counts (item counts, the
+     * "Unassigned" count and the total), or nothing to clear everything.
+     *
+     * @param string $taxonomy Optional folder taxonomy.
+     * @return void
+     */
+    public static function flush_count_cache($taxonomy = '')
+    {
+        if (empty($taxonomy)) {
+            delete_transient(self::COUNT_CACHE);
+            self::$count_cache = null;
+            return;
+        }
+
+        $cache = self::get_count_cache();
+        if (!isset($cache['tax'][$taxonomy])) {
+            return;
+        }
+        unset($cache['tax'][$taxonomy]);
+        self::$count_cache = $cache;
+        set_transient(self::COUNT_CACHE, $cache, 3 * DAY_IN_SECONDS);
+    }
+
+    /**
+     * Folder taxonomy of a post type, or an empty string when folders are off for it.
+     *
+     * @param string $post_type Post type.
+     * @return string
+     */
+    public static function folder_taxonomy_for_post_type($post_type)
+    {
+        if (empty($post_type) || !is_string($post_type) || !\Folders\Folders\Settings::check_for_folder($post_type)) {
+            return '';
+        }
+        return \Folders\Folders\Settings::get_folder_post_type($post_type);
+    }
+
+    /**
+     * Folder taxonomies of all folder-enabled post types.
+     *
+     * @return string[]
+     */
+    private static function folder_taxonomies()
+    {
+        if (self::$folder_taxonomies === null) {
+            self::$folder_taxonomies = [];
+            $options = \Folders\Folders\Settings::get_settings();
+            if (!empty($options) && is_array($options)) {
+                foreach ($options as $option) {
+                    self::$folder_taxonomies[] = \Folders\Folders\Settings::get_folder_post_type($option);
+                }
+            }
+        }
+        return self::$folder_taxonomies;
+    }
+
+    /**
+     * Post type that a folder taxonomy belongs to.
+     *
+     * @param string $taxonomy Folder taxonomy.
+     * @return string
+     */
+    private static function post_type_for_taxonomy($taxonomy)
+    {
+        if ($taxonomy == "post_folder") {
+            return "post";
+        } else if ($taxonomy == "folder") {
+            return "page";
+        } else if ($taxonomy == "media_folder") {
+            return "attachment";
+        }
+        // Strip the "_folder" suffix (trim() would strip characters, not the suffix).
+        return (substr($taxonomy, -7) === '_folder') ? substr($taxonomy, 0, -7) : $taxonomy;
+    }
+
+    /**
+     * Extra cache key part for counts that depend on more than the data, such
+     * as the admin language when WPML or Polylang is active.
+     *
+     * @param string $taxonomy  Folder taxonomy.
+     * @param string $post_type Post type.
+     * @return string
+     */
+    private static function count_context($taxonomy, $post_type)
+    {
+        $context = apply_filters('premio_folders_count_context', '', $taxonomy, $post_type);
+        return is_scalar($context) && $context !== '' ? '|' . $context : '';
+    }
+
+    /**
+     * Item counts (not trashed, not auto-drafts) of every folder in a taxonomy,
+     * keyed by term taxonomy ID, in a single query.
+     *
+     * @param string $taxonomy Folder taxonomy.
+     * @return int[]
+     */
+    private static function query_folder_counts($taxonomy)
+    {
+        global $wpdb;
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT tr.term_taxonomy_id AS ttid, COUNT(*) AS total
+            FROM {$wpdb->term_relationships} tr
+            INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+            INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
+            WHERE tt.taxonomy = %s
+            AND p.post_status NOT IN ('trash', 'auto-draft')
+            GROUP BY tr.term_taxonomy_id",
+            $taxonomy
+        ));
+
+        $counts = [];
+        if (!empty($rows)) {
+            foreach ($rows as $row) {
+                $counts[(int) $row->ttid] = (int) $row->total;
+            }
+        }
+        return $counts;
+    }
+
+    /**
+     * Item counts for the given folders of one taxonomy, keyed by term taxonomy ID.
+     *
+     * Counts come from the cache when possible. Otherwise all counts of the
+     * taxonomy are read with one query, or, when an integration supplies its
+     * own count through the `premio_folder_item_in_taxonomy` filter (WPML,
+     * Polylang), from that filter for each folder that is not cached yet.
+     *
+     * @param string     $taxonomy Folder taxonomy.
+     * @param \WP_Term[] $terms    Folders of that taxonomy.
+     * @return int[]
+     */
+    public static function get_folder_counts($taxonomy, $terms)
+    {
+        $post_type = self::post_type_for_taxonomy($taxonomy);
+        $key = 'terms' . self::count_context($taxonomy, $post_type);
+        $counts = self::get_cached_count($taxonomy, $key);
+        $counts = is_array($counts) ? $counts : [];
+
+        $missing = [];
+        foreach ($terms as $term) {
+            if (!array_key_exists((int) $term->term_taxonomy_id, $counts)) {
+                $missing[] = $term;
+            }
+        }
+        if (empty($missing)) {
+            return $counts;
+        }
+
+        $raw_counts = null;
+        if (has_filter("premio_folder_item_in_taxonomy")) {
+            foreach ($missing as $term) {
+                $count = apply_filters("premio_folder_item_in_taxonomy", $term->term_id, [
+                    'post_type' => $post_type,
+                    'taxonomy'  => $taxonomy,
+                ]);
+                if ($count === null) {
+                    // The integration does not handle this post type: use the plain count.
+                    if ($raw_counts === null) {
+                        $raw_counts = self::query_folder_counts($taxonomy);
+                    }
+                    $count = isset($raw_counts[(int) $term->term_taxonomy_id]) ? $raw_counts[(int) $term->term_taxonomy_id] : 0;
+                }
+                $counts[(int) $term->term_taxonomy_id] = (int) $count;
+            }
+        } else {
+            $counts = self::query_folder_counts($taxonomy);
+            foreach ($terms as $term) {
+                if (!isset($counts[(int) $term->term_taxonomy_id])) {
+                    $counts[(int) $term->term_taxonomy_id] = 0;
+                }
+            }
+        }
+
+        self::set_count_cache($taxonomy, $key, $counts);
+        return $counts;
     }
 
     /**
@@ -295,9 +540,9 @@ class FoldersItems {
      * Add a `trash_count` property to folder terms with the number of items that
      * are not trashed or auto-drafts.
      *
-     * Counts are cached per term taxonomy ID in the `premio_folders_without_trash`
-     * transient for three days. The `premio_folder_item_in_taxonomy` filter can
-     * supply the count instead (used by translation integrations).
+     * Runs for every get_terms() call on the site, so it returns straight away
+     * unless the query is for a folder taxonomy. Counts come from
+     * {@see get_folder_counts()} (cached, one query per taxonomy).
      *
      * @param \WP_Term[]|mixed $terms      Terms returned by get_terms().
      * @param string[]         $taxonomies Queried taxonomies.
@@ -306,110 +551,29 @@ class FoldersItems {
      */
     public function get_terms_filter_without_trash($terms, $taxonomies, $args)
     {
-        $isForFolders = 0;
-        if (!empty($taxonomies) && is_array($taxonomies) && count($taxonomies)) {
-            foreach ($taxonomies as $taxonomy) {
-                if (in_array($taxonomy, array("media_folder", "folder", "post_folder"))) {
-                    $isForFolders = 1;
-                } else {
-                    $folder = substr($taxonomy, -7);
-                    if ($folder == "_folder") {
-                        $isForFolders = 1;
-                    }
-                }
+        if (!is_array($terms) || empty($terms) || empty($taxonomies) || !is_array($taxonomies)) {
+            return $terms;
+        }
+
+        $folder_taxonomies = self::folder_taxonomies();
+        if (!array_intersect($taxonomies, $folder_taxonomies)) {
+            return $terms;
+        }
+
+        $by_taxonomy = [];
+        foreach ($terms as $term) {
+            if (is_object($term) && isset($term->term_id, $term->term_taxonomy_id, $term->taxonomy) && in_array($term->taxonomy, $folder_taxonomies, true)) {
+                $by_taxonomy[$term->taxonomy][] = $term;
             }
         }
 
-        if ($isForFolders) {
-            global $wpdb, $polylang;
-
-            // Check if Polylang is active or not.
-            $polylang_is_active = function_exists("pll_get_post_translations") && function_exists("pll_is_translated_post_type");
-
-            if (!is_array($terms) && count($terms) < 1) {
-                return $terms;
-            }
-
-            if(self::$transient_data === null) {
-                self::$transient_data = get_transient("premio_folders_without_trash");
-            }
-
-            $trash_folders = $initial_trash_folders = self::$transient_data;
-
-            if ($trash_folders === false) {
-                $trash_folders = array();
-                $initial_trash_folders = array();
-            }
-
-            $post_table = $wpdb->prefix . "posts";
-            $term_table = $wpdb->prefix . "term_relationships";
-            $options = get_option('folders_settings');
-            $option_array = array();
-            if (!empty($options)) {
-                foreach ($options as $option) {
-                    $option_array[] = \Folders\Folders\Settings::get_folder_post_type($option);
-                }
-            }
-            foreach ($terms as $key => $term) {
-                if (isset($term->term_id) && isset($term->taxonomy) && !empty($term->taxonomy) && in_array($term->taxonomy, $option_array)) {
-                    $trash_count = null;
-                    if (has_filter("premio_folder_item_in_taxonomy")) {
-                        $post_type = "";
-                        $taxonomy = $term->taxonomy;
-
-                        if ($taxonomy == "post_folder") {
-                            $post_type = "post";
-                        } else if ($taxonomy == "folder") {
-                            $post_type = "page";
-                        } else if ($taxonomy == "media_folder") {
-                            $post_type = "attachment";
-                        } else {
-                            $post_type = trim($taxonomy, "'_folder'");
-                        }
-                        $arg = array(
-                            'post_type' => $post_type,
-                            'taxonomy' => $taxonomy,
-                        );
-                        $trash_count = apply_filters("premio_folder_item_in_taxonomy", $term->term_id, $arg);
-                    } else {
-                        if ($trash_count == null && isset($trash_folders[$term->term_taxonomy_id]) && !$polylang_is_active) {
-                            $trash_count = $trash_folders[$term->term_taxonomy_id];
-                        } else if ($trash_count == null) {
-                            if (isset($trash_folders[$term->term_taxonomy_id])) {
-                                $trash_count = $trash_folders[$term->term_taxonomy_id];
-                            } else {
-                                if ($trash_count === null) {
-                                    $query = "SELECT COUNT(DISTINCT(p.ID)) 
-                                    FROM {$post_table} p
-                                        JOIN {$term_table} rl ON p.ID = rl.object_id
-                                        WHERE rl.term_taxonomy_id = '{$term->term_taxonomy_id}'
-                                          AND p.post_status != 'trash' 
-                                          AND p.post_status != 'auto-draft' 
-                                        LIMIT 1";
-                                    $result = $wpdb->get_var($query);
-                                    if (intval($result) > 0) {
-                                        $trash_count = intval($result);
-                                    } else {
-                                        $trash_count = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if ($trash_count === null) {
-                        $trash_count = 0;
-                    }
-                    $terms[$key]->trash_count = $trash_count;
-                    $trash_folders[$term->term_taxonomy_id] = $trash_count;
-                }
-            }
-
-            if (!empty($terms) && $initial_trash_folders != $trash_folders) {
-                delete_transient("premio_folders_without_trash");
-                set_transient("premio_folders_without_trash", $trash_folders, 3 * DAY_IN_SECONDS);
-                self::$transient_data = $trash_folders;
+        foreach ($by_taxonomy as $taxonomy => $taxonomy_terms) {
+            $counts = self::get_folder_counts($taxonomy, $taxonomy_terms);
+            foreach ($taxonomy_terms as $term) {
+                $term->trash_count = isset($counts[(int) $term->term_taxonomy_id]) ? $counts[(int) $term->term_taxonomy_id] : 0;
             }
         }
+
         return $terms;
     }//end get_terms_filter_without_trash()
 
@@ -441,7 +605,7 @@ class FoldersItems {
             'message'       => esc_html__('Folders updated successfully', 'folders'),
             'data'     => [
                 'folders' => $folders,
-                'folders_tree' => $folders_tree,
+                'folders_tree' => \Folders\Folders\FoldersTree::slim_tree($folders_tree),
                 'total_items' => $total_items,
                 'empty_items' => $empty_items,
             ]
@@ -458,6 +622,32 @@ class FoldersItems {
      * @return int|string Number of unassigned items.
      */
     public static function total_unassigned_items($post_type)
+    {
+        $taxonomy = \Folders\Folders\Settings::get_folder_post_type($post_type);
+        // Third-party filters can change this query per request; never cache then.
+        $use_cache = !has_filter('folders_count_join_query') && !has_filter('folders_count_where_query');
+        $key = 'unassigned' . self::count_context($taxonomy, $post_type);
+        if ($use_cache) {
+            $cached = self::get_cached_count($taxonomy, $key);
+            if ($cached !== null) {
+                return $cached;
+            }
+        }
+
+        $count = self::query_unassigned_items($post_type);
+        if ($use_cache) {
+            self::set_count_cache($taxonomy, $key, $count);
+        }
+        return $count;
+    }
+
+    /**
+     * Count the items of a post type that are not in any folder (uncached).
+     *
+     * @param string $post_type Post type.
+     * @return int|string Number of unassigned items.
+     */
+    private static function query_unassigned_items($post_type)
     {
         global $wpdb;
 
@@ -577,6 +767,31 @@ class FoldersItems {
         if (empty($post_type)) {
             $post_type = $typenow;
         }
+
+        $taxonomy = \Folders\Folders\Settings::get_folder_post_type($post_type);
+        $use_cache = !has_filter('folders_count_join_query') && !has_filter('folders_count_where_query');
+        $key = 'total' . self::count_context($taxonomy, $post_type);
+        if ($use_cache) {
+            $cached = self::get_cached_count($taxonomy, $key);
+            if ($cached !== null) {
+                return $cached;
+            }
+        }
+
+        $count = self::query_total_items($post_type);
+        if ($use_cache) {
+            self::set_count_cache($taxonomy, $key, $count);
+        }
+        return $count;
+    }
+
+    /**
+     * Count all items of a post type (uncached).
+     *
+     * @param string $post_type Post type.
+     * @return int|string Number of items.
+     */
+    private static function query_total_items($post_type) {
         $item_count = null;
         if (has_filter("premio_folder_all_categorized_items")) {
             $item_count = apply_filters("premio_folder_all_categorized_items", $post_type);

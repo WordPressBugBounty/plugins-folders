@@ -79,6 +79,25 @@ class FoldersTree {
     }
 
     /**
+     * Keep only the fields the folder dropdowns need from a folder tree.
+     *
+     * The tree list is sent to the browser next to the full folder list, so
+     * repeating every field (nonce, state, flags) for every folder only made
+     * the page larger.
+     *
+     * @param array[] $tree Folder tree from {@see arrange_folders_to_tree()}.
+     * @return array[]
+     */
+    public static function slim_tree( $tree ) {
+        $fields = [ 'id' => 1, 'parent_id' => 1, 'text' => 1, 'slug' => 1, 'count' => 1, 'trash_count' => 1, 'term_url' => 1 ];
+        $slim = [];
+        foreach ( (array) $tree as $folder ) {
+            $slim[] = array_intersect_key( (array) $folder, $fields );
+        }
+        return $slim;
+    }
+
+    /**
      * Recursively append the children of a folder to the result, depth first.
      *
      * @param array[] $grouped   Folders grouped by `parent_id`.

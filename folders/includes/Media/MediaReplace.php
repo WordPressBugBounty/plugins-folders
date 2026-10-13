@@ -326,6 +326,11 @@ class MediaReplace
             return $response;
         }
 
+        $status = apply_filters('remove_folders_file_replaced_meta', false, $attachment->ID);
+        if ($status) {
+            return $response;
+        }
+
         $refreshToken = get_post_meta($response['id'], "folders_file_replaced", true);
         if ($refreshToken !== false && !empty($refreshToken)) {
             if (isset($response['url']) && !empty($response['url'])) {
@@ -361,6 +366,11 @@ class MediaReplace
     public function update_to_new_url($image, $attachment_id, $size, $icon)
     {
         if ($image === false) {
+            return $image;
+        }
+
+        $status = apply_filters('remove_folders_file_replaced_meta', false, $attachment_id);
+        if ($status) {
             return $image;
         }
 

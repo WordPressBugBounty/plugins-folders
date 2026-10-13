@@ -124,9 +124,24 @@ class Wpml {
             add_filter('premio_folder_item_in_taxonomy', [$this, 'items_in_taxonomy'], 10, 2);
             add_filter('premio_folder_un_categorized_items', [$this, 'un_categorized_items'], 10, 2);
             add_filter('premio_folder_all_categorized_items', [$this, 'all_categorized_items'], 10, 2);
+            // Counts depend on the admin language: cache them per language.
+            add_filter('premio_folders_count_context', [$this, 'count_context']);
         }
 
     }//end init()
+
+    /**
+     * Cache key part for folder counts: the current admin language.
+     *
+     * Filter callback for `premio_folders_count_context`.
+     *
+     * @param string $context Current context.
+     * @return string
+     */
+    public function count_context($context = '')
+    {
+        return 'wpml-' . $this->lang;
+    }
 
     /**
      * Count the items in a folder for the current WPML language.

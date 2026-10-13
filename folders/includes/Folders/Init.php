@@ -12,10 +12,44 @@ defined( 'ABSPATH' ) || exit;
 class Init {
 
     /**
+     * Folder taxonomies registered on this request.
+     *
+     * @var string[]
+     */
+    private static $folder_taxonomies = [];
+
+    /**
      * Register the `init` hook (priority 15).
      */
     public function __construct() {
         add_action('init', [$this, 'create_folders_terms'], 15);
+        add_filter('to/get_terms_orderby/ignore', [$this, 'ignore_terms_order_plugin'], 10, 3);
+    }
+
+    /**
+     * Keep "Category Order and Taxonomy Terms Order" away from folder queries.
+     *
+     * That plugin rewrites the ORDER BY of every term query in wp-admin to its
+     * own `term_order` column, which replaces the folders' custom order and the
+     * sort options picked in the sidebar. Folders keep their own order, so tell
+     * it to leave queries that only read folder taxonomies alone.
+     *
+     * @param bool   $ignore  Whether the plugin should skip this query.
+     * @param string $orderby Current ORDER BY.
+     * @param array  $args    get_terms() arguments.
+     * @return bool
+     */
+    public function ignore_terms_order_plugin($ignore, $orderby = '', $args = []) {
+        if ($ignore || empty(self::$folder_taxonomies) || !is_array($args) || empty($args['taxonomy'])) {
+            return $ignore;
+        }
+
+        $taxonomies = (array) $args['taxonomy'];
+        if (array_diff($taxonomies, self::$folder_taxonomies)) {
+            return $ignore;
+        }
+
+        return true;
     }
 
     /**
@@ -114,6 +148,7 @@ class Init {
                 $folder,
                 $args
             );
+            self::$folder_taxonomies[] = $folder_post_type;
 
             add_action("create_{$folder_post_type}", function($term_id, $tt_id) {
                 if ( ! get_term_meta( $term_id, 'wcp_custom_order', true ) ) {

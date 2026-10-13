@@ -320,7 +320,7 @@ class FoldersAssets {
             'folders_settings',
             [
                 'folders'       => $folders,
-                'folders_tree' => $folders_tree,
+                'folders_tree' => \Folders\Folders\FoldersTree::slim_tree($folders_tree),
                 'ajax_url'      => admin_url( 'admin-ajax.php' ),
                 'rest_url'      => get_rest_url( null, 'folders-settings/v1/' ),
                 'rest_nonce'    => wp_create_nonce( 'wp_rest' ),

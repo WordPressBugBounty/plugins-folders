@@ -4,118 +4,176 @@ namespace Folders\Folders\Actions;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Invalidates the cached folder counts when content changes.
+ * Clears cached folder counts when they can have changed.
  *
- * Deletes the `premio_folders_without_trash` transient whenever a post or
- * attachment is saved, trashed or deleted, and whenever items are added to or
- * removed from a folder or a folder is deleted.
+ * Folder counts (items per folder, "Unassigned" and the total) only change
+ * when an item is added to or removed from a folder, changes status (for
+ * example draft to published, or into the trash), is created or is deleted.
+ * Updating a post's title or content does not change them, so saving a post
+ * no longer clears the cache. Only the counts of the affected post type's
+ * folder taxonomy are cleared.
  */
 class FoldersCache {
 
     /**
-     * Register post and attachment change hooks that clear the folder cache.
+     * Register the hooks that clear the folder count cache.
      */
     public function __construct() {
-        add_action('wp_trash_post', [$this, "delete_post"]);
-        add_action('before_delete_post', [$this, "delete_post"]);
-        add_action('save_post', [$this, "save_post"], 10, 3);
-        add_action('add_attachment', [$this, "delete_post"]);
-        add_action('edit_attachment', [$this, "delete_post"]);
-        add_action('delete_attachment', [$this, "delete_post"]);
-
-        // Folder assignments changed: items moved into or out of a folder, or a folder deleted.
-        add_action('set_object_terms', [$this, "object_terms_changed"], 10, 4);
+        // Folder assignments changed.
+        add_action('set_object_terms', [$this, "object_terms_changed"], 10, 6);
         add_action('deleted_term_relationships', [$this, "term_relationships_deleted"], 10, 3);
         add_action('delete_term', [$this, "term_deleted"], 10, 3);
+
+        // Status changes of posts (attachments do not fire this, see below).
+        add_action('transition_post_status', [$this, "post_status_changed"], 10, 3);
+
+        // Language changed (WPML; Polylang uses its "language" taxonomy,
+        // handled in object_terms_changed()).
+        add_action('wpml_translation_update', [$this, "wpml_translation_changed"]);
+
+        // Items created, trashed, restored or deleted.
+        add_action('add_attachment', [$this, "post_changed"]);
+        add_action('delete_attachment', [$this, "post_changed"]);
+        add_action('wp_trash_post', [$this, "post_changed"]);
+        add_action('untrashed_post', [$this, "post_changed"]);
+        add_action('before_delete_post', [$this, "post_changed"]);
     }
 
     /**
-     * Check whether a taxonomy is one of the plugin's folder taxonomies.
+     * Whether a taxonomy is one of the plugin's folder taxonomies.
      *
-     * @param string $taxonomy Taxonomy name.
+     * @param string $taxonomy Taxonomy slug.
      * @return bool
      */
     private static function is_folder_taxonomy($taxonomy)
     {
-        if (!is_string($taxonomy) || $taxonomy === '') {
-            return false;
-        }
-        return $taxonomy === 'folder' || substr($taxonomy, -7) === '_folder';
+        return is_string($taxonomy) && ($taxonomy === 'folder' || substr($taxonomy, -7) === '_folder');
     }
 
     /**
-     * Clear the folder count cache when an item's folders are set.
+     * Clear the counts of a post type's folders, if folders are enabled for it.
      *
-     * Hooked to `set_object_terms`.
-     *
-     * @param int    $object_id Object (post) ID.
-     * @param array  $terms     Terms that were set.
-     * @param array  $tt_ids    Term taxonomy IDs that were set.
-     * @param string $taxonomy  Taxonomy name.
+     * @param string $post_type Post type.
      * @return void
      */
-    public function object_terms_changed($object_id, $terms, $tt_ids, $taxonomy)
+    private static function flush_for_post_type($post_type)
     {
-        if (self::is_folder_taxonomy($taxonomy)) {
-            FoldersItems::flush_count_cache();
+        $taxonomy = FoldersItems::folder_taxonomy_for_post_type($post_type);
+        if (!empty($taxonomy)) {
+            FoldersItems::flush_count_cache($taxonomy);
         }
     }
 
     /**
-     * Clear the folder count cache when an item is removed from a folder.
+     * Clear the counts when items are assigned to folders.
      *
-     * Hooked to `deleted_term_relationships`.
+     * Skipped when the assignment did not change.
      *
-     * @param int    $object_id Object (post) ID.
-     * @param array  $tt_ids    Term taxonomy IDs that were removed.
-     * @param string $taxonomy  Taxonomy name.
+     * @param int    $object_id  Object ID.
+     * @param array  $terms      Terms.
+     * @param array  $tt_ids     New term taxonomy IDs.
+     * @param string $taxonomy   Taxonomy slug.
+     * @param bool   $append     Whether terms were appended.
+     * @param array  $old_tt_ids Previous term taxonomy IDs.
+     * @return void
+     */
+    public function object_terms_changed($object_id, $terms, $tt_ids, $taxonomy, $append = false, $old_tt_ids = [])
+    {
+        if ($taxonomy === 'language' || $taxonomy === 'post_translations') {
+            // Polylang: the item's language changed, which changes the
+            // language-specific counts of its post type.
+            if ($tt_ids != $old_tt_ids) {
+                $this->post_changed($object_id);
+            }
+            return;
+        }
+
+        if (!self::is_folder_taxonomy($taxonomy)) {
+            return;
+        }
+
+        $new_ids = array_map('intval', (array) $tt_ids);
+        $old_ids = array_map('intval', (array) $old_tt_ids);
+        sort($new_ids);
+        sort($old_ids);
+        if ($new_ids === $old_ids) {
+            return;
+        }
+
+        FoldersItems::flush_count_cache($taxonomy);
+    }
+
+    /**
+     * Clear the counts when items are removed from folders.
+     *
+     * @param int    $object_id Object ID.
+     * @param array  $tt_ids    Term taxonomy IDs.
+     * @param string $taxonomy  Taxonomy slug.
      * @return void
      */
     public function term_relationships_deleted($object_id, $tt_ids, $taxonomy)
     {
         if (self::is_folder_taxonomy($taxonomy)) {
-            FoldersItems::flush_count_cache();
+            FoldersItems::flush_count_cache($taxonomy);
         }
     }
 
     /**
-     * Clear the folder count cache when a folder is deleted.
-     *
-     * Hooked to `delete_term`.
+     * Clear the counts when a folder is deleted.
      *
      * @param int    $term     Term ID.
      * @param int    $tt_id    Term taxonomy ID.
-     * @param string $taxonomy Taxonomy name.
+     * @param string $taxonomy Taxonomy slug.
      * @return void
      */
     public function term_deleted($term, $tt_id, $taxonomy)
     {
         if (self::is_folder_taxonomy($taxonomy)) {
-            FoldersItems::flush_count_cache();
+            FoldersItems::flush_count_cache($taxonomy);
         }
     }
 
     /**
-     * Clear the folder count cache when a post is saved.
+     * Clear the counts when a post's status changes.
      *
-     * @param int      $post_id Post ID.
-     * @param \WP_Post $post    Post object.
-     * @param bool     $update  Whether this is an update of an existing post.
+     * @param string   $new_status New post status.
+     * @param string   $old_status Previous post status.
+     * @param \WP_Post $post       Post object.
      * @return void
      */
-    public function save_post($post_id, $post, $update)
+    public function post_status_changed($new_status, $old_status, $post)
     {
-        FoldersItems::flush_count_cache();
+        if ($new_status === $old_status || !isset($post->post_type)) {
+            return;
+        }
+        self::flush_for_post_type($post->post_type);
     }
 
     /**
-     * Clear the folder count cache when a post or attachment is added, edited, trashed or deleted.
+     * Clear the counts when WPML changes an item's language or translations.
      *
-     * @param int $postID Post ID.
+     * @param array $args Update details from WPML, with `element_id` and `element_type` (for example "post_page").
      * @return void
      */
-    public function delete_post($postID)
+    public function wpml_translation_changed($args)
     {
-        FoldersItems::flush_count_cache();
+        if (!is_array($args) || empty($args['element_type']) || strpos($args['element_type'], 'post_') !== 0) {
+            return;
+        }
+        self::flush_for_post_type(substr($args['element_type'], 5));
+    }
+
+    /**
+     * Clear the counts when an item is added, trashed, restored or deleted.
+     *
+     * @param int $post_id Post ID.
+     * @return void
+     */
+    public function post_changed($post_id)
+    {
+        $post_type = get_post_type($post_id);
+        if ($post_type) {
+            self::flush_for_post_type($post_type);
+        }
     }
 }

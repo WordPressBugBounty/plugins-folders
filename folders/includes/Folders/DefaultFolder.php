@@ -33,7 +33,18 @@ class DefaultFolder {
      */
     public function check_for_default_folders()
     {
+        // pre_get_posts fires for every query on every page. The redirect only
+        // applies to admin list screens and only needs checking once per page.
+        static $checked = false;
+        if ($checked || !is_admin() || wp_doing_ajax()) {
+            return;
+        }
         global $typenow, $current_screen;
+        if (!isset($current_screen->base) || ($current_screen->base != "edit" && $current_screen->base != "upload")) {
+            return;
+        }
+        $checked = true;
+
         $isAjax = (defined('DOING_AJAX') && DOING_AJAX) ? 1 : 0;
         $options = get_option('folders_settings');
         $options = (empty($options) || !is_array($options)) ? [] : $options;

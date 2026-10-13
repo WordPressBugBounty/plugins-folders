@@ -41,22 +41,8 @@ class MediaDropdown {
             return;
         }
         $folder_type = \Folders\Folders\Settings::get_folder_post_type('attachment');
+        // Assigning the folder clears the cached counts (see Actions\FoldersCache).
         wp_set_object_terms($post_ID, intval($folder_id), $folder_type);
-
-        $trash_folders = $initial_trash_folders = get_transient("premio_folders_without_trash");
-        if ($trash_folders === false) {
-            $trash_folders = [];
-            $initial_trash_folders = [];
-        }
-
-        if (isset($trash_folders[$folder_id])) {
-            unset($trash_folders[$folder_id]);
-        }
-
-        if ($initial_trash_folders != $trash_folders) {
-            delete_transient("premio_folders_without_trash");
-            set_transient("premio_folders_without_trash", $trash_folders, (3 * DAY_IN_SECONDS));
-        }
     }
 
     /**

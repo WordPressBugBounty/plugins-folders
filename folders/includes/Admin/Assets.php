@@ -17,6 +17,68 @@ class Assets {
      */
     public function __construct() {
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+        // Remove other plugins' assets that break the settings pages. Run at
+        // the end of admin_enqueue_scripts and again right before WordPress
+        // prints the head styles/scripts and the footer scripts, so assets
+        // added late are caught as well.
+        add_action( 'admin_enqueue_scripts', array( $this, 'dequeue_conflicting_assets' ), PHP_INT_MAX );
+        add_action( 'admin_print_styles', array( $this, 'dequeue_conflicting_assets' ), 1 );
+        add_action( 'admin_print_scripts', array( $this, 'dequeue_conflicting_assets' ), 1 );
+        add_action( 'admin_print_footer_scripts', array( $this, 'dequeue_conflicting_assets' ), 1 );
+    }
+
+    /**
+     * Admin page hook suffixes of the Folders settings pages.
+     *
+     * @return string[]
+     */
+    public static function settings_page_hooks() {
+        return [ 'settings_page_premio-folders-settings', 'toplevel_page_wcp_folders_settings', 'folders-settings_page_folders-upgrade-to-pro', 'folders-settings_page_recommended-folder-plugins' ];
+    }
+
+    /**
+     * Dequeue scripts and styles of other plugins that conflict with the
+     * Folders settings pages.
+     *
+     * "WP Dark Mode" (wp-dark-mode) restyles every admin page, which breaks
+     * the settings layout and its preview, so its assets are removed here.
+     * More handles can be added with the `folders_settings_conflicting_assets`
+     * filter (handle prefixes).
+     *
+     * @return void
+     */
+    public function dequeue_conflicting_assets() {
+        global $hook_suffix;
+        if ( empty( $hook_suffix ) || ! in_array( $hook_suffix, self::settings_page_hooks(), true ) ) {
+            return;
+        }
+
+        $prefixes = apply_filters( 'folders_settings_conflicting_assets', [ 'wp-dark-mode', 'wp-dark-plugins' ] );
+        $paths    = [ '/plugins/wp-dark-mode/' ];
+
+        foreach ( [ wp_scripts(), wp_styles() ] as $dependencies ) {
+            foreach ( (array) $dependencies->queue as $handle ) {
+                $conflicts = false;
+                foreach ( (array) $prefixes as $prefix ) {
+                    if ( is_string( $prefix ) && $prefix !== '' && strpos( $handle, $prefix ) === 0 ) {
+                        $conflicts = true;
+                        break;
+                    }
+                }
+                if ( ! $conflicts && isset( $dependencies->registered[ $handle ] ) && is_string( $dependencies->registered[ $handle ]->src ) ) {
+                    foreach ( $paths as $path ) {
+                        if ( strpos( $dependencies->registered[ $handle ]->src, $path ) !== false ) {
+                            $conflicts = true;
+                            break;
+                        }
+                    }
+                }
+                if ( $conflicts ) {
+                    $dependencies->dequeue( $handle );
+                }
+            }
+        }
     }
 
     /**
@@ -26,7 +88,7 @@ class Assets {
      * @return void
      */
     public function enqueue_scripts( $page ) {
-        if ( in_array( $page, [ 'settings_page_premio-folders-settings', 'toplevel_page_wcp_folders_settings', 'folders-settings_page_folders-upgrade-to-pro', 'folders-settings_page_recommended-folder-plugins' ], true ) ) {
+        if ( in_array( $page, self::settings_page_hooks(), true ) ) {
             self::enqueue_settings_assets();
         }
     }

@@ -113,6 +113,8 @@ class Polylang {
             add_filter('premio_folder_item_in_taxonomy', [$this, 'items_in_taxonomy'], 10, 2);
             add_filter('premio_folder_un_categorized_items', [$this, 'un_categorized_items'], 10, 2);
             add_filter('premio_folder_all_categorized_items', [$this, 'all_categorized_items'], 10, 2);
+            // Counts depend on the admin language: cache them per language.
+            add_filter('premio_folders_count_context', [$this, 'count_context']);
         }
 
         $user_id = get_current_user_id();
@@ -127,6 +129,19 @@ class Polylang {
         }
 
     }//end init()
+
+    /**
+     * Cache key part for folder counts: the current admin language.
+     *
+     * Filter callback for `premio_folders_count_context`.
+     *
+     * @param string $context Current context.
+     * @return string
+     */
+    public function count_context($context = '')
+    {
+        return 'pll-' . $this->poly_lang_term_taxonomy_id;
+    }
 
     /**
      * Resolve the term_taxonomy_id of the language the wp-admin top bar
