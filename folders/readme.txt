@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 4.7
 Tested up to: 7.1
-Stable tag: 3.2.8
+Stable tag: 3.2.9
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -223,6 +223,10 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.2.9 =
+Fixed a compatibility issue with Divi Builder where the New Folder popup appeared behind the media selection window.
+Fixed a compatibility issue with Elementor that prevented images from being reordered by drag and drop in the Edit Gallery window.
 
 = 3.2.8 =
 Restored support for special characters when creating or renaming folders, provided the name includes at least one letter or number.
