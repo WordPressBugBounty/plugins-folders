@@ -525,11 +525,10 @@ class FoldersItems {
         }
 
         $folder_id = isset( $params['folder_id'] ) ? sanitize_text_field( $params['folder_id'] ) : '';
-        if (!empty($folder_id)) {
-            delete_option("last_folder_status_for" . $post_type);
-            add_option("last_folder_status_for" . $post_type, $folder_id);
-        } else if(!empty($folder_id)) {
-            delete_option("last_folder_status_for" . $post_type);
+        if (!empty($post_type) && !empty($folder_id)) {
+            \Folders\Folders\UserFolders::set_last_folder($post_type, $folder_id);
+        } else if(!empty($post_type)) {
+            \Folders\Folders\UserFolders::set_last_folder($post_type, '');
         }
 
         return array(

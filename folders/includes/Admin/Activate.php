@@ -28,7 +28,6 @@ class Activate {
      */
     public function activate() {
         update_option("folder_redirect_status", 1);
-        add_option("folders_pro_is_in_process", 1);
 
         if (FOLDERS_VERSION == "3.0") {
             $hide_folder_color_pop_up = get_option("hide_folder_color_pop_up");
@@ -43,7 +42,5 @@ class Activate {
         if ($option === false) {
             add_option("folder_intro_box", "show");
         }
-
-        delete_option("folders_pro_is_in_process");
     }
 }

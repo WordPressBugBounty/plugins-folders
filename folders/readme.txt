@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 4.7
 Tested up to: 7.1
-Stable tag: 3.2.9
+Stable tag: 3.3.0
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -74,7 +74,7 @@ Upload pages, posts, images, videos, and audio. Then organize everything you upl
 * Organize your Plugins using Folders - create Folders for your plugins and organize them
 * Set Email Notifications - stay informed with notifications whenever an action occurs on Folders — whether a new file is uploaded by a team member, a post is deleted, or any other change is made.
 * Folders' icon colors
-* Download any media library folder as a ZIP: download any media library folder as a zip file
+* Download and Unzip ZIP Files: Download any Media Library folder as a ZIP file, or extract ZIP files directly into your Media Library while preserving their folder structure
 * Sticky folders - pin your folders to the upper part of the folders navigation area. Use the sticky folders feature to make your most important folders accessible
 * Star directories - keep your most important folders more visible
 * Upload folders from your PC - upload your computer folders, and all its structure (including subfolders) will be recreated on your WordPress website
@@ -119,8 +119,8 @@ The bulk organize media feature in Folders allows users to quickly and easily mo
 
 In addition to using drag-and-drop, users can also use the dropdown menu to move their files without using drag and drop. With the bulk organize media feature, users can take control of their WordPress media organization.
 
-= 💾 Download Media Library Folder =
-A feature you get with the Pro version with our easy-to-use interface, all the folders' content be downloaded in a ZIP file. Download the entire media library folder.
+= 💾 Download and Unzip Media Library Folders =
+With Folders Pro, easily download any Media Library folder and its contents as a ZIP file. You can also unzip ZIP files directly into your Media Library, automatically organizing extracted files into folders while preserving their folder structure.
 
 = 📤 Upload a folder structure locally from your computer =
 With the Pro version, upload a folder structure directly from your computer and replicate it as virtual folders in your media library. The upload folder button helps you upload the structure of the folder hierarchy directly, helping you save a lot of time as you can have a ready-made structure ready to use on folders without putting in a ton of effort and time into creating multiple folders and subfolders from scratch. 
@@ -134,7 +134,7 @@ Have you been using FileBird, Enhanced Media Library, Wicked Folders, Real Media
 
 = 💻 Use Cases for Folders =
 
-Wondering how you can use these pages, posts, and media library folders plugin for your online business?
+Wondering how to use Folders with your pages, posts & media library?
 
 <strong>Bloggers:</strong> Easily upload content for blogs, including text, photos, videos, and audio files. Then manage everything you upload by placing them in clearly labeled media library folders. 
 
@@ -223,6 +223,10 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.3.0 =
+New Pro Feature: Unzip ZIP Files: Extract ZIP files directly into your WordPress Media Library and organize their contents into folders.
+Improved Folder Assignment: Fixed an issue where newly created pages and posts were not automatically assigned to the selected folder.
 
 = 3.2.9 =
 Fixed a compatibility issue with Divi Builder where the New Folder popup appeared behind the media selection window.

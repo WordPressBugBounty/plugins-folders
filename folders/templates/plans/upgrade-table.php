@@ -181,8 +181,8 @@ $features = [
         'tooltip' => esc_html__("Upload a folder (all its content within the folder) directly", "folders")
     ],
     [
-        'title' => esc_html__("Download folders as ZIP", "folders"),
-        'tooltip' => esc_html__("Download all contents of a media folder as a ZIP", "folders")
+        'title' => esc_html__("Download and unzip ZIP folders", "folders"),
+        'tooltip' => esc_html__("Download folders and their contents as ZIP files, or unzip uploaded ZIP files directly into your WordPress Media Library while keeping their folder structure.", "folders")
     ],
     [
         'title' => esc_html__("Replace media for all file types and update file names from WordPress titles", "folders"),

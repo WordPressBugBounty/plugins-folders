@@ -17,8 +17,36 @@ class DefaultFolder {
      */
     public function __construct() {
         add_filter('pre_get_posts', [$this, 'check_for_default_folders']);
+        add_action( 'wp_insert_post', [$this, 'check_for_folders'], 10, 3 );
     }
 
+    public function check_for_folders($post_ID, $post, $update)
+    {
+        if(empty($post_ID) || empty($post) || empty($post->post_type)){
+            return;
+        }
+        $post_type = $post->post_type;
+        $status = \Folders\Folders\Settings::check_for_folder($post_type);
+
+        if(!$status){
+            return;
+        }
+
+        $last_status = \Folders\Folders\UserFolders::get_last_folder($post_type);
+        if(empty($last_status)){
+            return;
+        }
+
+        $folder_type = \Folders\Folders\Settings::get_folder_post_type($post_type);
+        if($last_status != "-1" && $last_status != "all") {
+            $term = get_term_by('slug', $last_status, $folder_type);
+            if (empty($term) || !is_object($term) || is_wp_error($term)) {
+                return;
+            }
+            $term_id = $term->term_id;
+            wp_set_object_terms($post_ID, $term_id, $folder_type);
+        }
+    }
     /**
      * Redirect an unfiltered list screen to the last opened or default folder.
      *
@@ -49,23 +77,12 @@ class DefaultFolder {
         $options = get_option('folders_settings');
         $options = (empty($options) || !is_array($options)) ? [] : $options;
         $post_status = filter_input(INPUT_GET, 'post_status');
-        $last_status = get_option("last_folder_status_for" . $typenow);
+        $last_status = \Folders\Folders\UserFolders::get_last_folder($typenow);
         if (empty($post_status) && !$isAjax && (in_array($typenow, $options) || !empty($last_status)) && (isset($current_screen->base) && ($current_screen->base == "edit" || ($current_screen->base == "upload")))) {
-            $requests = filter_input_array(INPUT_GET);
-            $requests = empty($requests) || !is_array($requests) ? [] : $requests;
+            $folder_type = \Folders\Folders\Settings::get_folder_post_type($typenow);
 
-            if ($typenow == "attachment") {
-                if (count($requests) > 0) {
-                    return;
-                }
-            } else if ($typenow == "post") {
-                if (count($requests) > 0) {
-                    return;
-                }
-            } else {
-                if (count($requests) > 1) {
-                    return;
-                }
+            if(isset($_REQUEST[$folder_type])){
+                return;
             }
 
             if (!empty($last_status)) {

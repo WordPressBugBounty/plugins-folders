@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Folders
  * Description: Organize your Media library, Pages, and Posts into folders. You can easily drag and drop items into directories and change the folders tree view.
- * Version: 3.2.9
+ * Version: 3.3.0
  * Author: Premio
  * Author URI: https://premio.io/downloads/folders/
  * Text Domain: folders
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'FOLDERS_VERSION', '3.2.9');
+define( 'FOLDERS_VERSION', '3.3.0');
 const FOLDERS_FILE = __FILE__;
 define( 'FOLDERS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FOLDERS_PLUGIN_BASE', plugin_basename( FOLDERS_FILE ) );
@@ -107,7 +107,7 @@ if ( ! class_exists( 'Folders' ) ) {
 }
 
 // Initialize the plugin
-if (!class_exists('folders_pro_init')) {
+if (!class_exists('folders_init')) {
     /**
      * Create the main plugin instance once all plugins are loaded.
      *
@@ -115,10 +115,10 @@ if (!class_exists('folders_pro_init')) {
      *
      * @return void
      */
-    function folders_pro_init() {
+    function folders_init() {
         Folders::get_instance();
     }
-    add_action( 'plugins_loaded', 'folders_pro_init' );
+    add_action( 'plugins_loaded', 'folders_init' );
 }
 
 /**
@@ -129,12 +129,12 @@ if (!class_exists('folders_pro_init')) {
  *
  * @return void
  */
-function folders_pro_activate_plugin() {
+function folders_activate_plugin() {
     require_once FOLDERS_PLUGIN_DIR . 'includes/Admin/Activate.php';
     $activator = new \Folders\Admin\Activate();
     $activator->activate();
 }
-register_activation_hook(__FILE__, 'folders_pro_activate_plugin');
+register_activation_hook(__FILE__, 'folders_activate_plugin');
 
 /**
  * Plugin deactivation callback.
@@ -145,12 +145,12 @@ register_activation_hook(__FILE__, 'folders_pro_activate_plugin');
  *
  * @return void
  */
-function folders_pro_deactivate_plugin() {
+function folders_deactivate_plugin() {
     require_once FOLDERS_PLUGIN_DIR . 'includes/Admin/Deactivate.php';
     $deactivator = new \Folders\Admin\Deactivate();
     $deactivator->deactivate();
 }
-register_deactivation_hook(__FILE__, 'folders_pro_deactivate_plugin');
+register_deactivation_hook(__FILE__, 'folders_deactivate_plugin');
 
 
 if (!function_exists("folders_sanitize_text")) {
