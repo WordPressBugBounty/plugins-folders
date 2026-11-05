@@ -22,7 +22,9 @@ class DefaultFolder {
 
     public function check_for_folders($post_ID, $post, $update)
     {
-        if(empty($post_ID) || empty($post) || empty($post->post_type)){
+        // Only new posts go to the last opened folder. On updates (Quick Edit,
+        // editor save, publish) the folders chosen by the user must be kept.
+        if($update || empty($post_ID) || empty($post) || empty($post->post_type)){
             return;
         }
         $post_type = $post->post_type;

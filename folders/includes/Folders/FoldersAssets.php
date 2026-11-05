@@ -450,6 +450,13 @@ class FoldersAssets {
         $custom_css .= '--folders-bulk-organize-bg-color: ' . esc_attr($settings['bulk_organize_button_color'] ? $settings['bulk_organize_button_color'] : '#FA166B') . ';';
         $custom_css .= '--folders-font-size: ' . esc_attr($folder_size ? $folder_size : '16') . 'px;';
         $custom_css .= '--folders-font-family: "' . esc_attr($folder_font) . '", sans-serif;';
+        if (is_plugin_active('admin-site-enhancements/admin-site-enhancements.php') && defined('ASENHA_VERSION')) {
+            $options = get_option('admin_site_enhancements');
+            if (isset($options['wider_admin_menu']) && $options['wider_admin_menu'] && isset($options['admin_menu_width']) && !empty($options['admin_menu_width'])) {
+                $admin_width = str_replace('px','', $options['admin_menu_width']);
+                $custom_css .= '--folders-sidebar-space: ' . esc_attr($admin_width) . 'px;';
+            }
+        }
         $custom_css .= '}';
         return $custom_css;
     }

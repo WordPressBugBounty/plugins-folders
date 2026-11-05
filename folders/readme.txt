@@ -3,7 +3,7 @@ Contributors: galdub, tomeraharon, premio
 Tags: folder, folders, replace media, pages folders, media library
 Requires at least: 4.7
 Tested up to: 7.1
-Stable tag: 3.3.0
+Stable tag: 3.3.1
 Plugin URI: https://premio.io/downloads/folders/
 License: GPLv3
 
@@ -223,6 +223,10 @@ Just follow our <a href="https://premio.io/wordpress-premio-pro-version-installa
 A live demo for the Folders plugin is available at <a href="https://demo.premio.io/folders/?utm_source=wordpressorg" target="_blank" title="Premio.io demo site">Premio's demo site</a>.
 
 == Changelog ==
+
+= 3.3.1 =
+Fixed an issue where folder assignments made through Quick Edit were not saved correctly.
+Fixed a compatibility issue with ASE’s Wider Admin Menu option that caused the WordPress admin menu to overlap the Folders sidebar.
 
 = 3.3.0 =
 New Pro Feature: Unzip ZIP Files: Extract ZIP files directly into your WordPress Media Library and organize their contents into folders.
